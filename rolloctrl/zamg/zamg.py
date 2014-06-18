@@ -11,9 +11,9 @@ import traceback
 import datetime
 
 # self-defined modules
-from mailparser import MailParser
-from csvdecoder import CsvDecoder
-from opcclient import OpcClient
+from rolloctrl.zamg.mailparser import MailParser
+from rolloctrl.zamg.csvdecoder import CsvDecoder
+from rolloctrl.shared.opcclient import OpcClient
 
 
 scriptname = os.path.splitext(os.path.basename(__file__))[0]

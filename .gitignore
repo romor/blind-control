@@ -1,3 +1,5 @@
 __pycache__
 /rolloctrl/zamg/*.csv
 /rolloctrl/zamg/zamg.ini
+*.egg-info
+*.log
