@@ -1,0 +1,10 @@
+Blind Control
+
+This project is about electrically controlled shutters and roller blinds. These are controlled with the Somfy RTS RF remote control system. In summer time, I like to automatically control the blinds such that they close if significant sun light would come insight and open again if direct sun light is over again.
+Since the blinds are located at different angles on different sides of the house I need individual control of the blinds, depending on their position.
+Also I want to maximize the opening time to have it as bright as possible insight. However, if the sun shines directly into a window the blind must be down to avoid overheating of the house.
+As a result, each blind shall only close if the sun has an angle for direct radiation. If possible the blind should also not close if the sky is cloudy and no direct sun light prevails.
+
+Please see the project website for more information.
+
+Copyright (C) 2014, Roman Morawek
