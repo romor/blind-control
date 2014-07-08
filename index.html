@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="blind-control : Automatically control sun blinds depending on sun radiation and temperature using a Somfy RTS remote control and a Raspberry Pi." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>blind-control</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/romor/blind-control">View on GitHub</a>
+
+          <h1 id="project_title">blind-control</h1>
+          <h2 id="project_tagline">Automatically control sun blinds depending on sun radiation and temperature using a Somfy RTS remote control and a Raspberry Pi.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/romor/blind-control/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/romor/blind-control/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="project-target" class="anchor" href="#project-target"><span class="octicon octicon-link"></span></a>Project Target</h1>
+
+<p>This project is about electrically controlled shutters and roller blinds. These are controlled with the Somfy RTS RF remote control system. In summer time, I like to automatically control the blinds such that they close if significant sun light would come insight and open again if direct sun light is over again.
+Since the blinds are located at different angles on different sides of the house I need individual control of the blinds, depending on their position.
+Also I want to maximize the opening time to have it as bright as possible insight. However, if the sun shines directly into a window the blind must be down to avoid overheating of the house.
+As a result, each blind shall only close if the sun has an angle for direct radiation. If possible the blind should also not close if the sky is cloudy and no direct sun light prevails.</p>
+
+<h1>
+<a name="possible-solutions" class="anchor" href="#possible-solutions"><span class="octicon octicon-link"></span></a>Possible solutions</h1>
+
+<p>How to control the blinds
+The following alternatives were considered by myself:
+1. Somfy Timer xxx
+Somfy offers a timer control for their systems such as xxx.
+TODO: add pict</p>
+
+<p><strong>Advantages</strong></p>
+
+<ul>
+<li>easy to implement: just by the unit and program it</li>
+</ul><p><strong>Disadvantages</strong></p>
+
+<ul>
+<li>only 1 channel per timer which means that I need several units for individual control of the blinds</li>
+<li>not possible to automatically change control based on cloudy wheather condition or temperatures</li>
+<li>not possible to automatically adapt it to changing sun position</li>
+</ul><ol>
+<li>Somfy PC Interface xxx
+Somfy offers a PC interface xxx which provides a serial interface. It is able to serve multiple channels so each blind could be controlled individually.
+TODO: add pict</li>
+</ol><p><strong>Advantages</strong></p>
+
+<ul>
+<li>available HW unit, only need for software development</li>
+<li>full flexibility with regard to switching control present</li>
+</ul><p><strong>Disadvantages</strong></p>
+
+<ul>
+<li>the price of the interface is way to expensive and not feasible at all. It seems that Somfy wants to inhibit such applications. Also on the product description Somfy mentions that there is no support for this interface product at all.</li>
+<li>the serial interface seems outdated to me. I prefer an ethernet connection such that I do not need a computer locally attached and running 24 hours per day.</li>
+</ul><ol>
+<li>Build own Interface
+The Somfy Teles 5 RTS is available for reasonable budget and offers 5 channels. If the button contact can be closed by some software controlled unit with ethernet interface I have all I need. This can easily be done using a Raspberry Pi.
+TODO: add pict</li>
+</ol><p><strong>Advantages</strong></p>
+
+<ul>
+<li>full flexibility</li>
+<li>low price</li>
+</ul><p><strong>Disadvantages</strong></p>
+
+<ul>
+<li>some more development effort needed, including hardware adaptations</li>
+</ul><p>I chose to go for solution 3 which I will outline in more detail below.</p>
+
+<h1>
+<a name="hardware-setup" class="anchor" href="#hardware-setup"><span class="octicon octicon-link"></span></a>Hardware Setup</h1>
+
+<p>The Somfy Telis 5 RTS provides the interface to the radio signal. I use this unit as it is and just solder wires to the button lines to control them automatically. The buttons seem to be connected to pull up resistors and close contact to ground if pressed. Therefore, I soldered wires to each button and the GND connection:
+TODO: add pict</p>
+
+<p>These wires are connected to the GPIO interface of a Raspberry Pi. So the wirering is like this:</p>
+
+<ul>
+<li>Telis GND &lt;-&gt; RPi GND (Pin xxx)</li>
+<li>Telis Button Up &lt;-&gt; RPi GPIO xx (Pin xxx)
+...</li>
+</ul><p>TODO: add pict</p>
+
+<h1>
+<a name="software" class="anchor" href="#software"><span class="octicon octicon-link"></span></a>Software</h1>
+
+<p>We have various software components involved:</p>
+
+<h2>
+<a name="weather-data-retrieval" class="anchor" href="#weather-data-retrieval"><span class="octicon octicon-link"></span></a>Weather Data Retrieval</h2>
+
+<p>This component determines the outside temperature and the probability of sun shine in near future. You need some weather service to provide this data. Usually you find something to access for current temperature and sun minutes per hour at your location. I was lucky and my local meterological institute offered me also forecast data which I receive regulary in CSV format per email.</p>
+
+<p>Thus I developed a Python script that retrieves the email from my personal email account and parses the weather data. The extracted sun shine probability and the outside temperature is then stored to an OPC server.
+This storage to an OPC XML-DA server has mainly historical reason because I have such system available (Loytec LINX 120). Otherwise it could e.g. just be stored to a file.
+Look at the zamg component xxx in the git repository for this functionality.</p>
+
+<h2>
+<a name="sun-power-calculation" class="anchor" href="#sun-power-calculation"><span class="octicon octicon-link"></span></a>Sun Power Calculation</h2>
+
+<p>This component derives the power of the sun as perceived for each individual window. It derives the current position of the sun on horizon (azimuth, altitude) and the angle of the sun light to each window. Based on this angle and the sun power from the weather retrieval component it derives the sun power for each window. Again, this is stored using an OPC datapoint.
+Look at the sunpower component xxx in the git repository for this functionality.</p>
+
+<h2>
+<a name="command-control" class="anchor" href="#command-control"><span class="octicon octicon-link"></span></a>Command Control</h2>
+
+<p>This component derives the up and down commands for the blinds. It compares the power from the sun power calculation component with a threshold parameter. If the power is above the threshold a close command to the blind is issued.</p>
+
+<h2>
+<a name="remote-control-driver" class="anchor" href="#remote-control-driver"><span class="octicon octicon-link"></span></a>Remote Control Driver</h2>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">blind-control maintained by <a href="https://github.com/romor">romor</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
