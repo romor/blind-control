@@ -43,10 +43,10 @@ As a result, each blind shall only close if the sun has an angle for direct radi
 <a name="possible-solutions" class="anchor" href="#possible-solutions"><span class="octicon octicon-link"></span></a>Possible solutions</h1>
 
 <p>How to control the blinds
-The following alternatives were considered by myself:
+The following alternatives were considered by me:
 
 
-<h3>Somfy Timer xxx</h3>
+<h3>1. Somfy Timer xxx</h3>
 <p>Somfy offers a timer control for their systems such as xxx.</p>
 <p>TODO: add pict</p>
 
@@ -58,12 +58,12 @@ The following alternatives were considered by myself:
 
 <ul>
 <li>only 1 channel per timer which means that I need several units for individual control of the blinds</li>
-<li>not possible to automatically change control based on cloudy wheather condition or temperatures</li>
+<li>not possible to automatically change control based on cloudy weather condition or temperatures</li>
 <li>not possible to automatically adapt it to changing sun position</li>
 </ul>
 
 
-<h3>Somfy PC Interface xxx</h3>
+<h3>2. Somfy PC Interface xxx</h3>
 <p>Somfy offers a PC interface xxx which provides a serial interface. It is able to serve multiple channels so each blind could be controlled individually.</p>
 <p>TODO: add pict</p>
 
@@ -75,12 +75,12 @@ The following alternatives were considered by myself:
 </ul><p><strong>Disadvantages</strong></p>
 
 <ul>
-<li>the price of the interface is way to expensive and not feasible at all. It seems that Somfy wants to inhibit such applications. Also on the product description Somfy mentions that there is no support for this interface product at all.</li>
+<li>the price of the interface is way too expensive and not feasible at all. It seems that Somfy wants to inhibit such applications. Also on the product description Somfy mentions that there is no support for this interface product at all.</li>
 <li>the serial interface seems outdated to me. I prefer an ethernet connection such that I do not need a computer locally attached and running 24 hours per day.</li>
 </ul>
 
 
-<h3>Build own Interface</h3>
+<h3>3. Build own Interface</h3>
 <p>The Somfy Teles 5 RTS is available for reasonable budget and offers 5 channels. If the button contact can be closed by some software controlled unit with ethernet interface I have all I need. This can easily be done using a Raspberry Pi.</p>
 <p>TODO: add pict</p>
 
@@ -105,7 +105,7 @@ The following alternatives were considered by myself:
 <p>The Somfy Telis 5 RTS provides the interface to the radio signal. I use this unit as it is and just solder wires to the button lines to control them automatically. The buttons seem to be connected to pull up resistors and close contact to ground if pressed. Therefore, I soldered wires to each button and the GND connection:
 TODO: add pict</p>
 
-<p>These wires are connected to the GPIO interface of a Raspberry Pi. So the wirering is like this:</p>
+<p>These wires are connected to the GPIO interface of a Raspberry Pi. So the wiring is like this:</p>
 
 <ul>
 <li>Telis GND &lt;-&gt; RPi GND (Pin xxx)</li>
@@ -121,7 +121,7 @@ TODO: add pict</p>
 <h2>
 <a name="weather-data-retrieval" class="anchor" href="#weather-data-retrieval"><span class="octicon octicon-link"></span></a>Weather Data Retrieval</h2>
 
-<p>This component determines the outside temperature and the probability of sun shine in near future. You need some weather service to provide this data. Usually you find something to access for current temperature and sun minutes per hour at your location. I was lucky and my local meterological institute offered me also forecast data which I receive regulary in CSV format per email.</p>
+<p>This component determines the outside temperature and the probability of sun shine in near future. You need some weather service to provide this data. Usually you find something to access for current temperature and sun minutes per hour at your location. I was lucky and my local meteorological institute offered me also forecast data which I receive regularly in CSV format per email.</p>
 
 <p>Thus I developed a Python script that retrieves the email from my personal email account and parses the weather data. The extracted sun shine probability and the outside temperature is then stored to an OPC server.
 This storage to an OPC XML-DA server has mainly historical reason because I have such system available (Loytec LINX 120). Otherwise it could e.g. just be stored to a file.
@@ -146,8 +146,10 @@ Look at the sunpower component xxx in the git repository for this functionality.
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
       <footer class="inner">
-        <p class="copyright">blind-control maintained by <a href="https://github.com/romor">romor</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+	  <p class="copyright">Copyright (C) 2014, <a href="https://github.com/romor">Roman Morawek</a><br>
+      <a href="http://romor.github.io/blind-control">http://romor.github.io/blind-control</a><br>
+      <a href="https://github.com/romor/blind-control">https://github.com/romor/blind-control</a><br>
+      License: <a href="http://www.gnu.org/licenses/gpl.html">GNU General Public License, Version 3</a></p>
       </footer>
     </div>
 
