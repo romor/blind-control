@@ -16,11 +16,11 @@ def run_setup(args):
     """install and run post-install commands."""
     # install
     setuptools.setup(
-        name='rolloctrl',
+        name='blind-control',
         version="0.1",
-        description='rolloctrl',
-        long_description='control somfy rollos using weather data from ZAMG',
-        author='Roman',
+        description='blind-control',
+        long_description='Automatically control motorized blinds depending on sun radiation and temperature using a Somfy RTS remote control and a Raspberry Pi.',
+        author='Roman Morawek',
         author_email='maemo@morawek.at',
         packages=setuptools.find_packages(),
         include_package_data=True,

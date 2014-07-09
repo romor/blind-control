@@ -22,7 +22,7 @@ configfile = scriptname + ".ini"
 usage = """\
 Usage: {name}
 
-Perform automatic window rollo control.
+Perform automatic sun blind control.
 """.format(name=scriptname)
 
 
