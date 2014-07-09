@@ -1,6 +1,8 @@
 {
     "_comment": "altitude unten: 45, oben: 37.5, Dach: 25",
+	
     "AZIMUTH_BASE": -16.5,
+	
 	"REMOTES": {
 		"north": {
 			"channel": 16,
@@ -15,6 +17,7 @@
 			"my": 11
 		}
 	},
+	
     "WINDOWS": [
         {
             "name": "Jalousie Ost",
@@ -22,55 +25,6 @@
 			"opc": { "power": 4, "ctrl": 0},
 			"remote": { "id": "north", "channel": 0 },
 			"down_cmd": "my"
-        },
-        {
-            "name": "Rollladen Ost",
-            "alt": 49,
-            "az": 90,
-            "opc_power": 5,
-            "power": 0
-        },
-        {
-            "name": "Jalousie West",
-            "alt": 0,
-            "az": 270,
-            "opc_power": 7,
-            "power": 0
-        },
-        {
-            "name": "Rollladen West",
-            "alt": 49,
-            "az": 270,
-            "opc_power": 6,
-            "power": 0
-        },
-        {
-            "name": "Rollladen S\u00fcd",
-            "alt": 45,
-            "az": 180,
-            "opc_power": 8,
-            "power": 0
-        },
-        {
-            "name": "Terasse S\u00fcd",
-            "alt": 0,
-            "az": 180,
-            "opc_power": 9,
-            "power": 0
-        },
-        {
-            "name": "Dach Ost",
-            "alt": 65,
-            "az": 90,
-            "opc_power": 10,
-            "power": 0
-        },
-        {
-            "name": "Dach West",
-            "alt": 65,
-            "az": 270,
-            "opc_power": 11,
-            "power": 0
         }
     ]
 }
