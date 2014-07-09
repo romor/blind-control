@@ -19,7 +19,7 @@
           <a id="forkme_banner" href="https://github.com/romor/blind-control">View on GitHub</a>
 
           <h1 id="project_title">blind-control</h1>
-          <h2 id="project_tagline">Automatically control sun blinds depending on sun radiation and temperature using a Somfy RTS remote control and a Raspberry Pi.</h2>
+          <h2 id="project_tagline">Automatically control motorized blinds depending on sun radiation and temperature using a Somfy RTS remote control and a Raspberry Pi.</h2>
 
             <section id="downloads">
               <a class="zip_download_link" href="https://github.com/romor/blind-control/zipball/master">Download this project as a .zip file</a>
@@ -34,7 +34,7 @@
         <h1>
 <a name="project-target" class="anchor" href="#project-target"><span class="octicon octicon-link"></span></a>Project Target</h1>
 
-<p>This project is about electrically controlled shutters and roller blinds. These are controlled with the Somfy RTS RF remote control system. In summer time, I like to automatically control the blinds such that they close if significant sun light would come insight and open again if direct sun light is over again.
+<p>This project is about electrically controlled roller shutters and motorized blinds. These are controlled with the Somfy RTS RF remote control system. In summer time, I like to automatically control the blinds such that they close if significant sun light would come insight and open again if direct sun light is over again.
 Since the blinds are located at different angles on different sides of the house I need individual control of the blinds, depending on their position.
 Also I want to maximize the opening time to have it as bright as possible insight. However, if the sun shines directly into a window the blind must be down to avoid overheating of the house.
 As a result, each blind shall only close if the sun has an angle for direct radiation. If possible the blind should also not close if the sky is cloudy and no direct sun light prevails.</p>
@@ -46,9 +46,9 @@ As a result, each blind shall only close if the sun has an angle for direct radi
 The following alternatives were considered by me:
 
 
-<h3>1. Somfy Timer xxx</h3>
-<p>Somfy offers a timer control for their systems such as xxx.</p>
-<p>TODO: add pict</p>
+<h3>1. Use Somfy Timer Unit</h3>
+<p>Somfy offers a timer control for their systems such as Chronis Comfort RTS Timer.</p>
+<p><img src="images/somfy_chronis.jpg" alt="Chronis Comfort RTS Timer"></p>
 
 <p><strong>Advantages</strong></p>
 
@@ -63,26 +63,26 @@ The following alternatives were considered by me:
 </ul>
 
 
-<h3>2. Somfy PC Interface xxx</h3>
-<p>Somfy offers a PC interface xxx which provides a serial interface. It is able to serve multiple channels so each blind could be controlled individually.</p>
-<p>TODO: add pict</p>
+<h3>2. Somfy Universial RTS Interface</h3>
+<p>Somfy offers a universal interface, which provides a RS485 communication interface. It is able to serve multiple channels so each blind could be controlled individually.</p>
+<p><img src="images/somfy_rs485.jpg" alt="Somfy Universal Interface"></p>
 
 <p><strong>Advantages</strong></p>
 
 <ul>
-<li>available HW unit, only need for software development</li>
-<li>full flexibility with regard to switching control present</li>
+<li>available HW unit, only software development necessary</li>
+<li>full flexibility with regard to automation</li>
 </ul><p><strong>Disadvantages</strong></p>
 
 <ul>
-<li>the price of the interface is way too expensive and not feasible at all. It seems that Somfy wants to inhibit such applications. Also on the product description Somfy mentions that there is no support for this interface product at all.</li>
+<li>from my perspective the interface is much too expensive. It seems that Somfy wants to inhibit such applications. Also on the product description Somfy mentions that there is no support for this interface product at all.</li>
 <li>the serial interface seems outdated to me. I prefer an ethernet connection such that I do not need a computer locally attached and running 24 hours per day.</li>
 </ul>
 
 
-<h3>3. Build own Interface</h3>
-<p>The Somfy Teles 5 RTS is available for reasonable budget and offers 5 channels. If the button contact can be closed by some software controlled unit with ethernet interface I have all I need. This can easily be done using a Raspberry Pi.</p>
-<p>TODO: add pict</p>
+<h3>3. Build my own Interface</h3>
+<p>The Somfy Telis 4 RTS is available for reasonable budget and offers 5 channels. If the button contact can be closed by some software controlled unit with ethernet interface I have all I need. This can easily be done using a Raspberry Pi.</p>
+<p><img src="images/somfy_telis_4.jpg" alt="Somfy Telis 4"> <img src="images/raspberry_pi.jpg" alt="Raspberry Pi"></p>
 
 <p><strong>Advantages</strong></p>
 <ul>
@@ -92,7 +92,7 @@ The following alternatives were considered by me:
 
 <p><strong>Disadvantages</strong></p>
 <ul>
-<li>some more development effort needed, including hardware adaptations</li>
+<li>more development effort needed, including hardware adaptations</li>
 </ul>
 
 <p>I chose to go for solution 3 which I will outline in more detail below.</p>
@@ -102,8 +102,8 @@ The following alternatives were considered by me:
 <h1>
 <a name="hardware-setup" class="anchor" href="#hardware-setup"><span class="octicon octicon-link"></span></a>Hardware Setup</h1>
 
-<p>The Somfy Telis 5 RTS provides the interface to the radio signal. I use this unit as it is and just solder wires to the button lines to control them automatically. The buttons seem to be connected to pull up resistors and close contact to ground if pressed. Therefore, I soldered wires to each button and the GND connection:
-TODO: add pict</p>
+<p>The Somfy Telis 5 RTS provides the interface to the radio signal. I use this unit as it is and just solder wires to the button lines to control them automatically. The buttons seem to be connected to pull up resistors and close contact to ground if pressed. Therefore, I soldered wires to each button and the GND connection:</p>
+<p>TODO: add pict</p>
 
 <p>These wires are connected to the GPIO interface of a Raspberry Pi. So the wiring is like this:</p>
 
@@ -111,7 +111,7 @@ TODO: add pict</p>
 <li>Telis GND &lt;-&gt; RPi GND (Pin xxx)</li>
 <li>Telis Button Up &lt;-&gt; RPi GPIO xx (Pin xxx)
 ...</li>
-</ul><p>TODO: add pict</p>
+</ul><p>TODO: complete list</p>
 
 <h1>
 <a name="software" class="anchor" href="#software"><span class="octicon octicon-link"></span></a>Software</h1>
@@ -140,6 +140,9 @@ Look at the sunpower component xxx in the git repository for this functionality.
 
 <h2>
 <a name="remote-control-driver" class="anchor" href="#remote-control-driver"><span class="octicon octicon-link"></span></a>Remote Control Driver</h2>
+
+<p>This component reads the desired switching status from the OPC data point and compares it with the current status, which is also stored via OPC (some other storage location like a file would be fine, too). If the status differs it triggers the command on the Telis remote. For this it needs to switch to the corresponding RF channel and issue the open or close command afterwards. Finally it switches the RF channel back to channel 1. The driver also makes sure that all blinds are operated sequentially even if the status changes simultanuous. This is necessary because the single Telis remote control can just operate on the currently selected channel.</p>
+
       </section>
     </div>
 
