@@ -26,14 +26,14 @@ class MailParser():
 
 
     def parse(self):
-        server = IMAPClient(self.config['email.host'])
-        server.login(self.config['email.user'], self.config['email.password'])
+        server = IMAPClient(self.config['EMAIL']['servername'])
+        server.login(self.config['EMAIL']['username'], self.config['EMAIL']['password'])
         logging.getLogger().debug("connected to IMAP server")
 
         select_info = server.select_folder('INBOX')
         # get list of fitting messages
         messages = server.search(['NOT DELETED',
-                                  'SUBJECT "' + self.config['email.subject_key'] + '"'])
+                                  'SUBJECT "' + self.config['EMAIL']['subject'] + '"'])
         logging.getLogger().info("%d email message(s) found" % len(messages))
 
         # loop through all messages
@@ -44,11 +44,11 @@ class MailParser():
             self.__process_message(msg)
 
         # delete messages?
-        if len(messages) > 0 and int(self.config['email.deleteAfterProcessing']):
-            if int(self.config['email.deleteAfterProcessing']) > 1:
+        if len(messages) > 0 and int(self.config['EMAIL']['deleteAfterProcessing']):
+            if int(self.config['EMAIL']['deleteAfterProcessing']) > 1:
                 messages = messages[:-1]
             server.delete_messages(messages)
-            if self.config['email.expungeMailbox']:
+            if self.config['EMAIL']['expungeMailbox']:
                 server.expunge()
             logging.getLogger().info("Deleted email message(s) from server")
 
@@ -57,7 +57,7 @@ class MailParser():
 
     def __process_message(self, msg):
         # some more integrity checks
-        if not msg.is_multipart() or msg['subject'] != self.config['email.subject_key']:
+        if not msg.is_multipart() or msg['subject'] != self.config['EMAIL']['subject']:
             logging.getLogger().error("invalid message detected")
             return
         logging.getLogger().info("processing email message from " + msg.get("Date"))

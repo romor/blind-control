@@ -6,6 +6,7 @@ import os, json
 
 
 class SunPower():
+    # "_comment": "altitude unten: 45, oben: 37.5, Dach: 25",
     # windows = [
     # {
         # 'name':   'Jalousie Ost',

@@ -3,3 +3,4 @@ __pycache__
 /blindctrl/zamg/zamg.ini
 *.egg-info
 *.log
+/blindctrl/shared/config.json
