@@ -1,6 +1,6 @@
 """This module provides utility functions used during application initialization."""
 
-import os, os.path, shutil
+import os, sys, shutil
 import logging
 import json
 
@@ -12,12 +12,18 @@ class StandardScript:
 
 
     def init_config(self):
+        # extract filename
+        self.scriptname = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+        
         # ensure existing server config file
         filename = self._checkConfigFile()
         
         # read config file
         with open(filename) as config_file:
-            self.config = json.load(config_file)
+            try:
+                self.config = json.load(config_file)
+            except:
+                raise Exception("JSON configuration file error. Please check for typos in config file.")
 
 
     def _checkConfigFile(self):
@@ -42,16 +48,13 @@ class StandardScript:
 
     def init_logging(self):
         """setup logging to file and console"""
-        # extract filename
-        scriptname = os.path.splitext(os.path.basename(sys.argv[0]))[0]
-
         # setup root logger
         # we assume a higher log level on console logger
         logging.getLogger().setLevel(self.config['LOGGING']['log_level_console'].upper())
 
         # create file and console handler
-        log_file = logging.FileHandler(os.path.join(config['log_dir'],
-                                                    scriptname + '.log'))
+        filename = os.path.join(self.config['LOGGING']['log_dir'], self.scriptname + '.log')
+        log_file = logging.FileHandler(filename)
         log_file.setLevel(self.config['LOGGING']['log_level_file'].upper())
         log_console = logging.StreamHandler()
         log_console.setLevel(self.config['LOGGING']['log_level_console'].upper())

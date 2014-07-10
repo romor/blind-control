@@ -2,7 +2,12 @@
 # -*- coding: iso-8859-15 -*-
 
 # standard modules
-import sys, os
+import sys
+import os
+import logging
+import datetime
+import traceback
+import configparser
 
 # self-defined modules
 from blindctrl.shared.stdscript import StandardScript
@@ -18,7 +23,7 @@ If <filename> is given, it parses the csv content and writes its data to the
 datapoint.
 If <filename> is not given, it fetches email from the configured email server and
 downloads and processes all data files.
-""".format(name=os.path.splitext(os.path.basename(sys.argv[0]))[0])
+"""
 
 
 class Zamg(StandardScript):
@@ -66,9 +71,9 @@ class Zamg(StandardScript):
 
     def set_file(self, temperature, sun):
         config = configparser.ConfigParser()
-        config['DEFAULT'] = {}
-        config['DEFAULT']['Temperature'] = temperature
-        config['DEFAULT']['SunPower'] = sun
+        config[self.scriptname] = {}
+        config[self.scriptname]['Temperature'] = str(temperature)
+        config[self.scriptname]['SunPower'] = str(sun)
         with open(self.config['FILE_STORAGE']['filename'], 'w') as configfile:
           config.write(configfile)
 
@@ -114,10 +119,10 @@ if __name__ == "__main__":
         # parse file given on command line
         logging.getLogger().info("Importing file " + sys.argv[1])
         if os.path.isfile(sys.argv[1]):
-            zamg.process_csv(open(sys.argv[1], 'rb').read())
+            zamg.process_csv(open(sys.argv[1], 'rb').read().decode())
             zamg.process_data()
         else:
             logging.getLogger().error("Import file not found.")
 
     else:
-        print(usage)
+        print(usage.format(name=zamg.scriptname))
