@@ -73,7 +73,7 @@ class SunPower():
 
     def __init__(self):
         # read configuration
-        config_path = os.path.join(os.path.split(__file__)[0], "shared", "config.json")
+        config_path = os.path.join(os.path.split(__file__)[0], os.pardir, "shared", "config.json")
         with open(config_path) as config_file:    
             self.config = json.load(config_file)
 
@@ -109,7 +109,7 @@ class SunPower():
         return angle
 
 
-    def process(self, sun_minutes):
+    def process(self, sun_power):
         # result array
         power_values = []
         
@@ -125,7 +125,7 @@ class SunPower():
 
             # check for sun: must be visible and window angle OK
             if sun.alt > self.MIN_ALTITUDE*math.pi/180 and angle < self.ANGLE_LIMIT*math.pi/180:
-                power = cos_phi * sun_minutes
+                power = math.cos(angle) * sun_power
             else:
                 power = 0.0
 
