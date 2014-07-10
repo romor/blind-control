@@ -9,6 +9,7 @@ import shutil
 import configparser
 import traceback
 import datetime
+import configparser
 
 # self-defined modules
 from blindctrl.zamg.mailparser import MailParser
@@ -16,7 +17,7 @@ from blindctrl.zamg.csvdecoder import CsvDecoder
 from blindctrl.shared.opcclient import OpcClient
 
 
-scriptname = os.path.splitext(os.path.basename(__file__))[0]
+scriptname = os.path.splitext(__file__)[0]
 configfile = scriptname + ".ini"
 
 usage = """\
@@ -96,6 +97,15 @@ class Zamg:
         opcclient.write(opc_tags, types, values)
 
 
+    def set_file(self, temperature, sun):
+        config = configparser.ConfigParser()
+        config['DEFAULT'] = {}
+        config['DEFAULT']['Temperature'] = temperature
+        config['DEFAULT']['SunPower'] = sun
+        with open(self.config['opc.url'][len("file:"):], 'w') as configfile:
+          config.write(configfile)
+
+
     def process_mail(self):
         # check for entered configuration
         if len(self.config['email.host']) == 0:
@@ -118,8 +128,11 @@ class Zamg:
         # if retrieval succeeded we have valid data now
         if self.data:
             # process data
-            # store temperature, sun and powers to virtual input
-            self.set_opc(self.data['temperature'], self.data['sun']/60)
+            if self.config['opc.url'].startswith("file:"):
+                # store temperature, sun and powers to OPC server
+                self.set_opc(self.data['temperature'], self.data['sun']/60)
+            else:
+                self.set_file(self.data['temperature'], self.data['sun']/60)
 
 
 def setup_logging():

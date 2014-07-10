@@ -43,7 +43,10 @@ class MailParser():
             msg = email.message_from_string(response[msgid]['RFC822'])
             self.__process_message(msg)
 
+        # delete messages?
         if len(messages) > 0 and int(self.config['email.deleteAfterProcessing']):
+            if int(self.config['email.deleteAfterProcessing']) > 1:
+                messages = messages[:-1]
             server.delete_messages(messages)
             if self.config['email.expungeMailbox']:
                 server.expunge()
