@@ -16,7 +16,7 @@ def run_setup(args):
     """install and run post-install commands."""
     # install
     setuptools.setup(
-        name='blind-control',
+        name='blindctrl',
         version="0.1",
         description='blind-control',
         long_description='Automatically control motorized blinds depending on sun radiation and temperature using a Somfy RTS remote control and a Raspberry Pi.',

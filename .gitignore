@@ -1,5 +1,5 @@
 __pycache__
-/blind-control/zamg/*.csv
-/blind-control/zamg/zamg.ini
+/blindctrl/zamg/*.csv
+/blindctrl/zamg/zamg.ini
 *.egg-info
 *.log
