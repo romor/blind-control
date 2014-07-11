@@ -31,6 +31,11 @@ class Zamg(StandardScript):
         # call parent constructor
         super().__init__()
 
+        # setup OPC interface
+        if self.config['OPC_STORAGE']['enabled']:
+            self.opcclient = OpcClient(self.config['OPC_STORAGE']['url'], 
+                                       self.config['OPC_STORAGE']['password'])
+
         # setup data members
         self.data = None
 
@@ -56,9 +61,6 @@ class Zamg(StandardScript):
     def set_opc(self, temperature, sun):
         logging.getLogger().info("Set temperature: {}, sun: {:2f}".format(temperature, sun))
 
-        # setup OPC interface
-        opcclient = OpcClient(self.config['OPC_STORAGE']['url'], self.config['OPC_STORAGE']['password'])
-
         # setup values
         opc_tags = [self.config['OPC_STORAGE']['tag_temperature'], 
                     self.config['OPC_STORAGE']['tag_sunpower']]
@@ -66,16 +68,20 @@ class Zamg(StandardScript):
         values = [temperature, sun]
 
         # write data to OPC
-        opcclient.write(opc_tags, types, values)
+        self.opcclient.write(opc_tags, types, values)
 
 
     def set_file(self, temperature, sun):
         config = configparser.ConfigParser()
+        # read existing file data
+        if os.path.isfile(self.config['FILE_STORAGE']['filename']):
+            config.read(self.config['FILE_STORAGE']['filename'])
+            
         config[self.scriptname] = {}
         config[self.scriptname]['Temperature'] = str(temperature)
         config[self.scriptname]['SunPower'] = str(sun)
         with open(self.config['FILE_STORAGE']['filename'], 'w') as configfile:
-          config.write(configfile)
+            config.write(configfile)
 
 
     def process_mail(self):
