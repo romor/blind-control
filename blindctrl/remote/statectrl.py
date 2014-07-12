@@ -57,7 +57,12 @@ class StateCtrl:
             self.current_states.append(state)
             
             # process desired states
-            state = int(config['commander'][window['name']])
+            try:
+                state = int(config['commander'][window['name']])
+            except KeyError:
+                logging.getLogger().error("No command state present for {}."\
+                                .format(window['name']))
+                state = 0
             self.desired_states.append(state)
 
 

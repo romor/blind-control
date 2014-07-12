@@ -58,7 +58,12 @@ class Commander(StandardScript):
         del self.power_values[:]
         # process desired states
         for window in self.config['WINDOWS']:
-            cur_power = float(config['sunpower'][window['name']])
+            try:
+                cur_power = float(config['sunpower'][window['name']])
+            except KeyError:
+                logging.getLogger().error("No power value present for {}."\
+                                .format(window['name']))
+                cur_power = 0
             self.power_values.append(cur_power)
 
 
