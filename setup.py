@@ -9,6 +9,7 @@ import pkg_resources
 # needed packages
 REQUIRES = [
     'ephem',
+    'RPi.GPIO',
 ]
 
 
