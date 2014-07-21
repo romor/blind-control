@@ -5,6 +5,7 @@
 import logging
 import time
 import RPi.GPIO as GPIO
+import atexit
 
 # self-defined modules
 
@@ -31,6 +32,8 @@ class RemoteDriver:
         # setup RPi
         # use P1 header pin numbering convention
         GPIO.setmode(GPIO.BOARD)
+        # reset all pins to inputs at exit
+        atexit.register(GPIO.cleanup)
         
 
     def process_cmds(self, cmds):
