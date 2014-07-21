@@ -44,7 +44,7 @@ class OpcClient():
 
 
     def __init__(self, url, password):
-        self.url = "http://{}/DA".format(url)
+        self.url = url
 
         credentials = "operator:{}".format(password).encode()
         encoded_credentials = base64.b64encode(credentials)
@@ -100,4 +100,14 @@ class OpcClient():
 
         request = urllib.request.Request(self.url, msg_body.encode(), self.http_headers)
         result = urllib.request.urlopen(request)
-        #print(result.read())
+
+        # parse result
+        response = result.read()
+        #print(response)
+        root = ET.fromstring(response)
+        item_list = root[0][0][1]
+        values_ok = []
+        for i in range(len(item_list)):
+            # if the item contains a subnode (with "Value" tag) the command succeded
+            if len(item_list[i]) == 0:
+                logging.getLogger().error("Error writing {}.".format(opc_tags[i]))

@@ -72,16 +72,19 @@ class RemoteDriver:
 
 
     def switch_pin(self, pin_nr):
-        # Pin ON
-        # to turn a button on we just need to set the GPIO to output
-        # it will then output low level, which equals a button press
-        GPIO.setup(pin_nr, GPIO.OUT)
-        # delay
-        time.sleep(self.BUTTON_TIMEOUT)
+        try:
+            # Pin ON
+            # to turn a button on we just need to set the GPIO to output
+            # it will then output low level, which equals a button press
+            GPIO.setup(pin_nr, GPIO.OUT)
+            # delay
+            time.sleep(self.BUTTON_TIMEOUT)
 
-        # Pin OFF
-        # accordingly, to turn a button of we configure the GPIO to input
-        # the high impetance state equals no button press
-        GPIO.setup(pin_nr, GPIO.IN)
-        # delay
-        time.sleep(self.BUTTON_TIMEOUT)
+            # Pin OFF
+            # accordingly, to turn a button of we configure the GPIO to input
+            # the high impetance state equals no button press
+            GPIO.setup(pin_nr, GPIO.IN)
+            # delay
+            time.sleep(self.BUTTON_TIMEOUT)
+        except RuntimeError as ex:
+            logging.getLogger().error("Error controlling GPIOs: " + str(ex))

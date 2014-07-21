@@ -8,6 +8,7 @@ import logging
 import configparser
 
 # self-defined modules
+from blindctrl.shared.opcclient import OpcClient
 
 
 class StateCtrl:
@@ -24,7 +25,10 @@ class StateCtrl:
     def get_switching_commands(self):
         # read current and desired states
         self.read_file()
-            
+        if self.config['OPC_STORAGE']['enabled']:
+            self.read_opc()
+
+
         # determine switching commands
         for i in range(len(self.config['WINDOWS'])):
             if self.current_states[i] != self.desired_states[i]:
@@ -64,6 +68,26 @@ class StateCtrl:
                                 .format(window['name']))
                 state = 0
             self.desired_states.append(state)
+
+
+    def read_opc(self):
+        opcclient = OpcClient(self.config['OPC_STORAGE']['url'],
+                              self.config['OPC_STORAGE']['password'])
+        opc_tags = [
+            self.config['OPC_STORAGE']['tag_control'],
+        ]
+        values = opcclient.read(opc_tags)
+        value = values[0]
+
+        for i in range(len(self.config['WINDOWS'])):
+            # process current state
+            ctrl_id = self.config['WINDOWS'][i]['opc']['ctrl']
+            try:
+                state = int(value[2*i:2*i+2])
+                self.desired_states[i] = state
+            except KeyError:
+                logging.getLogger().error("Error getting state for window {}, {}"\
+                        .format(ctrl_id, self.config['WINDOWS'][i]['name']))
 
 
     def store_new_states(self):

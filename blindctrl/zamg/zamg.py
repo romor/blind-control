@@ -48,8 +48,8 @@ class Zamg(StandardScript):
             # loop through data
             for row in decoder.data:
                 # is this the current estimate?
-                timediff = (row['date']-datetime.datetime.now()).total_seconds()
-                if timediff > 0 and timediff <= 3600:
+                timediff = (row['date']-datetime.datetime.utcnow()).total_seconds()
+                if -3600 <= timediff < 0:
                     # store data as best guess
                     self.data = row
 

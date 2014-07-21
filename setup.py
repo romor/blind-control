@@ -10,6 +10,7 @@ import pkg_resources
 REQUIRES = [
     'ephem',
     'RPi.GPIO',
+    'imapclient',
 ]
 
 

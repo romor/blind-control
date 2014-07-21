@@ -11,6 +11,7 @@ import traceback
 # self-defined modules
 from blindctrl.shared.stdscript import StandardScript
 from blindctrl.sunpower.powercalc import PowerCalculator
+from blindctrl.shared.opcclient import OpcClient
 
 
 usage = """\
@@ -59,17 +60,28 @@ class SunPower(StandardScript):
         except Exception as e:
             logging.getLogger().error(traceback.format_exc())
             raise
-            
-            
+
+
     def read_opc(self):
         opc_tags = [
             self.config['OPC_STORAGE']['tag_temperature'],
-            self.config['OPC_STORAGE']['opc.tag_sunpower'],
+            self.config['OPC_STORAGE']['tag_sunpower'],
         ]
         values = self.opcclient.read(opc_tags)
-        self.temperature_out = float(values[0])
-        self.sunpower        = float(values[1])
-        
+
+        try:
+            self.temperature_out = float(values[0])
+        except TypeError:
+            logging.getLogger().error("Error converting temperature: " + str(values[0]))
+            self.temperature_out = 0
+
+        try:
+            self.sunpower        = float(values[1])
+        except TypeError:
+            logging.getLogger().error("Error converting sun power: " + str(values[1]))
+            self.sunpower = 0
+
+            
     def read_file(self):
         config = configparser.ConfigParser()
         config.read(self.config['FILE_STORAGE']['filename'])
