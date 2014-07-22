@@ -37,6 +37,8 @@ class StateCtrl:
                     cmd = self.config['WINDOWS'][i]['down_cmd']
                 else:
                     cmd = "up"
+                logging.getLogger().info("Switching {} to {}.".format(
+                        self.config['WINDOWS'][i]['name'], cmd))
                 # store command
                 self.cmds.append({
                     'remote': self.config['WINDOWS'][i]['remote'],
@@ -64,7 +66,9 @@ class StateCtrl:
             try:
                 state = int(config['commander'][window['name']])
             except KeyError:
-                logging.getLogger().error("No command state present for {}."\
+                # this is an error only if we use file commands, not OPC
+                if not self.config['OPC_STORAGE']['enabled']:
+                    logging.getLogger().error("No command state present for {}."\
                                 .format(window['name']))
                 state = 0
             self.desired_states.append(state)
@@ -83,7 +87,7 @@ class StateCtrl:
             # process current state
             ctrl_id = self.config['WINDOWS'][i]['opc']['ctrl']
             try:
-                state = int(value[2*i:2*i+2])
+                state = int(value[2*ctrl_id:2*ctrl_id+2])
                 self.desired_states[i] = state
             except KeyError:
                 logging.getLogger().error("Error getting state for window {}, {}"\
