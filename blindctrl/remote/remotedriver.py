@@ -18,7 +18,8 @@ class RemoteDriver:
     CHANNEL_TIMEOUT = 6     # seconds
     
     # time interval for normal button presses
-    BUTTON_TIMEOUT = 0.1    # seconds
+    BUTTON_HOLD    = 0.1    # seconds
+    BUTTON_TIMEOUT = 0.2    # seconds
 
     
     def __init__(self, remote_name, remote_config):
@@ -78,7 +79,7 @@ class RemoteDriver:
             # it will then output low level, which equals a button press
             GPIO.setup(pin_nr, GPIO.OUT)
             # delay
-            time.sleep(self.BUTTON_TIMEOUT)
+            time.sleep(self.BUTTON_HOLD)
 
             # Pin OFF
             # accordingly, to turn a button of we configure the GPIO to input
