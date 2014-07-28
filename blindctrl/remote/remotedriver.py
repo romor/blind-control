@@ -43,7 +43,7 @@ class RemoteDriver:
         
         for cur_cmd in cmds:
             # process command
-            logging.getLogger().info("Remote {}: channel {} {}".format(
+            logging.getLogger().debug("Remote {}: channel {} {}".format(
                     self.remote_name, cur_cmd['channel'], cur_cmd['cmd']))
             self.set_channel(cur_cmd['channel'])
             self.invoke_cmd(cur_cmd['cmd'])

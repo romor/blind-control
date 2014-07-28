@@ -90,7 +90,7 @@ class OpcClient():
         # build message body
         opc_string = ""
         for i in range(len(opc_tags)):
-            logging.getLogger().info("writing {}={}".format(opc_tags[i], values[i]))
+            logging.getLogger().debug("writing {}={}".format(opc_tags[i], values[i]))
             opc_string += '<Items ItemName="{tag}" ClientItemHandle="{tag}">'.format(tag=opc_tags[i])
             opc_string += '<Value xsi:type="{}">'.format(types[i])
             opc_string += str(values[i])

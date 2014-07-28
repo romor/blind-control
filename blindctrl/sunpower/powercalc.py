@@ -23,7 +23,7 @@ class PowerCalculator():
         # Vienna: 48 degree north; 16 degree east
         o.lat, o.long, o.date = '48:13', '16:22', datetime.datetime.utcnow()
         sun = ephem.Sun(o)
-        logging.getLogger().info("sun azimuth: {}; altitude: {}".format(sun.az, sun.alt))
+        logging.getLogger().debug("sun azimuth: {}; altitude: {}".format(sun.az, sun.alt))
         # transform from polar to euklid coordinates
         return sun
         
@@ -58,7 +58,8 @@ class PowerCalculator():
         # loop through all windows
         for window in windows:
             # transform from polar to euklid coordinates
-            window_coordinates = self.polar_to_euklid(window['geo']['az'], window['geo']['alt'])
+            window_coordinates = self.polar_to_euklid(window['geo']['az']*math.pi/180, 
+                                                      window['geo']['alt']*math.pi/180)
             angle = self.get_angle(sun_coordinates, window_coordinates)
 
             # check for sun: must be visible and window angle OK
@@ -69,5 +70,11 @@ class PowerCalculator():
 
             # store result
             self.power_values.append(power)
-            logging.getLogger().info("{}: angle: {:0.0f}, power: {:0.2f}".format(
+            # perform logging
+            if power > 0:
+                logging.getLogger().info("{}: angle: {:0.0f}, power: {:0.2f}".format(
                     window['name'], angle*180/math.pi, power))
+            else:
+                logging.getLogger().debug("{}: angle: {:0.0f}, power: {:0.2f}".format(
+                    window['name'], angle*180/math.pi, power))
+

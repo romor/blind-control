@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: iso-8859-15 -*-
 
 # standard modules
@@ -49,7 +49,7 @@ class RemoteCtrl(StandardScript):
                 # TODO: wait until remote threads are finished
                 
             else:
-                logging.getLogger().info("No switching necessary.")
+                logging.getLogger().debug("No switching necessary.")
 
             # store desired states
             # we do this even if we did not switch anything to initialize the storage if needed
