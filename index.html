@@ -57,7 +57,7 @@ The following alternatives were considered by me:
 </ul><p><strong>Disadvantages</strong></p>
 
 <ul>
-<li>only 1 channel per timer which means that I need several units for individual control of the blinds</li>
+<li>only 1 channel per timer, which means that I need several units for individual control of the blinds</li>
 <li>not possible to automatically change control based on cloudy weather condition or temperatures</li>
 <li>not possible to automatically adapt it to changing sun position</li>
 </ul>
@@ -95,7 +95,7 @@ The following alternatives were considered by me:
 <li>more development effort needed, including hardware adaptations</li>
 </ul>
 
-<p>I chose to go for solution 3 which I will outline in more detail below.</p>
+<p>I chose to go for solution 3, which I will outline in more detail below.</p>
 
 
 
@@ -103,15 +103,20 @@ The following alternatives were considered by me:
 <a name="hardware-setup" class="anchor" href="#hardware-setup"><span class="octicon octicon-link"></span></a>Hardware Setup</h1>
 
 <p>The Somfy Telis 5 RTS provides the interface to the radio signal. I use this unit as it is and just solder wires to the button lines to control them automatically. The buttons seem to be connected to pull up resistors and close contact to ground if pressed. Therefore, I soldered wires to each button and the GND connection:</p>
-<p>TODO: add pict</p>
+<p><img src="images/soldering_2.jpg" alt="soldered wires on Somfy Telis"></p>
 
 <p>These wires are connected to the GPIO interface of a Raspberry Pi. So the wiring is like this:</p>
 
 <ul>
-<li>Telis GND &lt;-&gt; RPi GND (Pin xxx)</li>
-<li>Telis Button Up &lt;-&gt; RPi GPIO xx (Pin xxx)
-...</li>
-</ul><p>TODO: complete list</p>
+<li>Telis Battery - &lt;-&gt; RPi GND</li>
+<li>Telis Battery + &lt;-&gt; RPi 3.3 V</li>
+<li>Telis Buttons &lt;-&gt; RPi GPIOs</li>
+</ul>
+<p>Refer to the Excel spreadsheat for concrete pin numbering.</p>
+
+<p>The total setup including the Raspberry Pi is shown here:</p>
+<p><img src="images/assembly.jpg" alt="Somfy Telis assembled to Raspberry Pi"></p>
+
 
 <h1>
 <a name="software" class="anchor" href="#software"><span class="octicon octicon-link"></span></a>Software</h1>
@@ -121,27 +126,27 @@ The following alternatives were considered by me:
 <h2>
 <a name="weather-data-retrieval" class="anchor" href="#weather-data-retrieval"><span class="octicon octicon-link"></span></a>Weather Data Retrieval</h2>
 
-<p>This component determines the outside temperature and the probability of sun shine in near future. You need some weather service to provide this data. Usually you find something to access for current temperature and sun minutes per hour at your location. I was lucky and my local meteorological institute offered me also forecast data which I receive regularly in CSV format per email.</p>
+<p>This component determines the outside temperature and the probability of sun shine in near future. You need some weather service to provide this data. Normally you should be able to find some public web side to access for current temperature and sun minutes per hour at your location. I was lucky and my local meteorological institute offered me also forecast data, which I receive regularly in CSV format per email.</p>
 
 <p>Thus I developed a Python script that retrieves the email from my personal email account and parses the weather data. The extracted sun shine probability and the outside temperature is then stored to an OPC server.
-This storage to an OPC XML-DA server has mainly historical reason because I have such system available (Loytec LINX 120). Otherwise it could e.g. just be stored to a file.
-Look at the zamg component xxx in the git repository for this functionality.</p>
+This storage to an OPC XML-DA server mainly has historical reason because I have such system available (Loytec LINX 120). Alternatively it is also stored to a file.
+Look at the zamg component in the git repository for this functionality.</p>
 
 <h2>
-<a name="sun-power-calculation" class="anchor" href="#sun-power-calculation"><span class="octicon octicon-link"></span></a>Sun Power Calculation</h2>
+<a name="sun-power-calculation" class="anchor" href="#sun-power-calculation"><span class="octicon octicon-link"></span></a>Window Power Calculation</h2>
 
-<p>This component derives the power of the sun as perceived for each individual window. It derives the current position of the sun on horizon (azimuth, altitude) and the angle of the sun light to each window. Based on this angle and the sun power from the weather retrieval component it derives the sun power for each window. Again, this is stored using an OPC datapoint.
-Look at the sunpower component xxx in the git repository for this functionality.</p>
+<p>This component derives the power of the sun as perceived for each individual window. It derives the current position of the sun on horizon (azimuth, altitude) and the angle of the sun light to each window. Based on this angle it derives the effective sun power for each window. Again, this is stored using an OPC datapoint and in a file.
+Look at the sunpower component in the git repository for this functionality.</p>
 
 <h2>
 <a name="command-control" class="anchor" href="#command-control"><span class="octicon octicon-link"></span></a>Command Control</h2>
 
-<p>This component derives the up and down commands for the blinds. It compares the power from the sun power calculation component with a threshold parameter. If the power is above the threshold a close command to the blind is issued.</p>
+<p>This component derives the up and down commands for the blinds. It compares the sun power from weather servie and the effective radiation angle from each window with threshold parameters. If the threshold is reached the desired state of the window is set to closed.</p>
 
 <h2>
 <a name="remote-control-driver" class="anchor" href="#remote-control-driver"><span class="octicon octicon-link"></span></a>Remote Control Driver</h2>
 
-<p>This component reads the desired switching status from the OPC data point and compares it with the current status, which is also stored via OPC (some other storage location like a file would be fine, too). If the status differs it triggers the command on the Telis remote. For this it needs to switch to the corresponding RF channel and issue the open or close command afterwards. Finally it switches the RF channel back to channel 1. The driver also makes sure that all blinds are operated sequentially even if the status changes simultanuous. This is necessary because the single Telis remote control can just operate on the currently selected channel.</p>
+<p>This component reads the desired switching status from the OPC data point or file storage and compares it with the current status, which is also stored via OPC or file. If the status differs it triggers the command on the Telis remote. For this it needs to switch to the corresponding RF channel and issue the open or close command afterwards. Finally it switches the RF channel back to channel 1. The driver also makes sure that all blinds are operated sequentially even if the status changes simultanuous. This is necessary because the single Telis remote control can just operate on the currently selected channel.</p>
 
       </section>
     </div>
