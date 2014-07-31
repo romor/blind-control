@@ -47,7 +47,7 @@ class PowerCalculator():
         return angle
 
 
-    def process(self, sun_power, windows):
+    def process(self, windows):
         # clear result array, if already filled
         del self.power_values[:]
         
@@ -64,7 +64,7 @@ class PowerCalculator():
 
             # check for sun: must be visible and window angle OK
             if sun.alt > self.MIN_ALTITUDE*math.pi/180 and angle < self.ANGLE_LIMIT*math.pi/180:
-                power = math.cos(angle) * sun_power
+                power = math.cos(angle)
             else:
                 power = 0.0
 

@@ -39,17 +39,8 @@ class SunPower(StandardScript):
         
     def process(self):
         try:
-            # read sun power
-            # we prefer the OPC storage over the file storage
-            if self.config['OPC_STORAGE']['enabled']:
-                self.read_opc()
-            else:
-                self.read_file()
-            logging.getLogger().info("Temperature: {}; sun: {}"\
-                            .format(self.temperature_out, self.sunpower))
-            
-            # process power values
-            self.calculator.process(self.sunpower, self.config['WINDOWS'])
+            # process effective angles
+            self.calculator.process(self.config['WINDOWS'])
             
             # store power values
             if self.config['OPC_STORAGE']['enabled']:
@@ -60,33 +51,6 @@ class SunPower(StandardScript):
         except Exception as e:
             logging.getLogger().error(traceback.format_exc())
             raise
-
-
-    def read_opc(self):
-        opc_tags = [
-            self.config['OPC_STORAGE']['tag_temperature'],
-            self.config['OPC_STORAGE']['tag_sunpower'],
-        ]
-        values = self.opcclient.read(opc_tags)
-
-        try:
-            self.temperature_out = float(values[0])
-        except TypeError:
-            logging.getLogger().error("Error converting temperature: " + str(values[0]))
-            self.temperature_out = 0
-
-        try:
-            self.sunpower        = float(values[1])
-        except TypeError:
-            logging.getLogger().error("Error converting sun power: " + str(values[1]))
-            self.sunpower = 0
-
-            
-    def read_file(self):
-        config = configparser.ConfigParser()
-        config.read(self.config['FILE_STORAGE']['filename'])
-        self.temperature_out = float(config['zamg']['Temperature'])
-        self.sunpower        = float(config['zamg']['SunPower'])
 
 
     def save_opc(self):

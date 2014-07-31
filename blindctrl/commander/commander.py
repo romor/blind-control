@@ -25,6 +25,8 @@ class Commander(StandardScript):
         super().__init__()
         
         # initialize data storage
+        self.temperature_out
+        self.sunpower
         self.power_values = []
         self.desired_states = []
 
@@ -39,7 +41,8 @@ class Commander(StandardScript):
             del self.desired_states[:]
             # process desired states
             for i in range(len(self.config['WINDOWS'])):
-                self.desired_states.append(self.power_values[i] > self.config['CONTROL']['threshold'])
+                desired_state = self._get_desired_state(self.power_values[i])
+                self.desired_states.append(desired_state)
             
             # store desired states
             # we just support file storage
@@ -48,12 +51,23 @@ class Commander(StandardScript):
         except Exception as e:
             logging.getLogger().error(traceback.format_exc())
             raise
-            
-            
+
+
+    def _get_desired_state(self, window_power):
+        # for active blinding we need two conditions fullfilled:
+        # (1) sun power is above threshold and (2) radiation angle is in suitable range
+		# also include outside temperature?
+        return (self.sunpower >= self.config['CONTROL']['weather_threshold']) && \
+               (window_power >= self.config['CONTROL']['angle_threshold'])
+
+
     def read_file(self):
         config = configparser.ConfigParser()
         config.read(self.config['FILE_STORAGE']['filename'])
-        
+
+        self.temperature_out = float(config['zamg']['Temperature'])
+        self.sunpower        = float(config['zamg']['SunPower'])
+
         # clear result array, if already filled
         del self.power_values[:]
         # process desired states
@@ -78,7 +92,7 @@ class Commander(StandardScript):
         for i in range(len(self.config['WINDOWS'])):
             config[self.scriptname][self.config['WINDOWS'][i]['name']] = \
                                         str(int(self.desired_states[i]))
-                                        
+
         # save data file
         with open(self.config['FILE_STORAGE']['filename'], 'w') as configfile:
             config.write(configfile)
