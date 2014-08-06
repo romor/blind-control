@@ -25,8 +25,8 @@ class Commander(StandardScript):
         super().__init__()
         
         # initialize data storage
-        self.temperature_out
-        self.sunpower
+        self.temperature_out = None
+        self.sunpower = None
         self.power_values = []
         self.desired_states = []
 
@@ -57,7 +57,7 @@ class Commander(StandardScript):
         # for active blinding we need two conditions fullfilled:
         # (1) sun power is above threshold and (2) radiation angle is in suitable range
 		# also include outside temperature?
-        return (self.sunpower >= self.config['CONTROL']['weather_threshold']) && \
+        return (self.sunpower >= self.config['CONTROL']['weather_threshold']) and \
                (window_power >= self.config['CONTROL']['angle_threshold'])
 
 
