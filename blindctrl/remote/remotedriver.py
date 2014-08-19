@@ -6,11 +6,12 @@ import logging
 import time
 import RPi.GPIO as GPIO
 import atexit
+import threading 
 
 # self-defined modules
 
 
-class RemoteDriver:
+class RemoteDriver(threading.Thread):
     # Somfy Telis 4 has 5 channels
     NR_CHANNELS = 5
     
@@ -22,10 +23,14 @@ class RemoteDriver:
     BUTTON_TIMEOUT = 0.2    # seconds
 
     
-    def __init__(self, remote_name, remote_config):
+    def __init__(self, remote_name, remote_config, cmds):
+        # call parent's constructor
+        super().__init__()
+        
         # store configuration
         self.remote_name = remote_name
         self.remote_config = remote_config
+        self.commands = cmds
         
         # initialize remote
         self.cur_channel = 0
@@ -37,11 +42,11 @@ class RemoteDriver:
         atexit.register(GPIO.cleanup)
         
 
-    def process_cmds(self, cmds):
+    def run(self):
         # cmds has following format: 
         # [ { 'channel', 'cmd' } ] where cmd of ('up', 'down', 'my')
         
-        for cur_cmd in cmds:
+        for cur_cmd in self.commands:
             # process command
             logging.getLogger().debug("Remote {}: channel {} {}".format(
                     self.remote_name, cur_cmd['channel'], cur_cmd['cmd']))

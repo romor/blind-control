@@ -41,13 +41,18 @@ class RemoteCtrl(StandardScript):
                 command_ctrl.derive_remote_commands(self.state_ctrl.cmds)
 
                 # control remotes
+                drivers_running = []
                 for remote_cmds in command_ctrl.cmds:
                     remote_parameter = self.config['REMOTES'][remote_cmds['id']]
-                    driver = RemoteDriver(remote_cmds['id'], remote_parameter)
-                    driver.process_cmds(remote_cmds['cmds'])
-                    
-                # TODO: wait until remote threads are finished
-                
+                    driver = RemoteDriver(remote_cmds['id'], remote_parameter, remote_cmds['cmds'])
+                    # invoke background thread to control the remote
+                    driver.start()
+                    drivers_running.append(driver)
+
+                # wait until remote threads are finished
+                for cur_thread in drivers_running:
+                    cur_thread.join()
+
             else:
                 logging.getLogger().debug("No switching necessary.")
 
