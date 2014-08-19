@@ -11,9 +11,9 @@ class PowerCalculator():
     MIN_ALTITUDE = 1
     ANGLE_LIMIT  = 80
 
-    def __init__(self):
+    def __init__(self, config):
+        self.config = config
         self.power_values = []
-        pass
 
 
     @staticmethod
@@ -47,6 +47,32 @@ class PowerCalculator():
         return angle
 
 
+    def get_window_power(self, sun, sun_coordinates, window):
+        # transform from polar to euklid coordinates
+        window_coordinates = self.polar_to_euklid(window['geo']['az']*math.pi/180, 
+                                                  window['geo']['alt']*math.pi/180)
+        # determine angle
+        angle = self.get_angle(sun_coordinates, window_coordinates)
+        
+        # determine range restrictions
+        if 'min_altitude' in window['geo']:
+            altitude_limit = window['geo']['min_altitude']
+        else:
+            altitude_limit = self.config['CONTROL']['min_altitude']
+        if 'max_angle' in window['geo']:
+            angle_limit = window['geo']['max_angle']
+        else:
+            angle_limit = self.config['CONTROL']['max_angle']
+        
+        # check for sun: must be visible and window angle OK
+        if sun.alt > altitude_limit*math.pi/180 and angle < angle_limit*math.pi/180:
+            power = math.cos(angle)
+        else:
+            power = 0.0
+
+        return angle, power
+        
+
     def process(self, windows):
         # clear result array, if already filled
         del self.power_values[:]
@@ -57,16 +83,7 @@ class PowerCalculator():
 
         # loop through all windows
         for window in windows:
-            # transform from polar to euklid coordinates
-            window_coordinates = self.polar_to_euklid(window['geo']['az']*math.pi/180, 
-                                                      window['geo']['alt']*math.pi/180)
-            angle = self.get_angle(sun_coordinates, window_coordinates)
-
-            # check for sun: must be visible and window angle OK
-            if sun.alt > self.MIN_ALTITUDE*math.pi/180 and angle < self.ANGLE_LIMIT*math.pi/180:
-                power = math.cos(angle)
-            else:
-                power = 0.0
+            angle, power = self.get_window_power(sun, sun_coordinates, window)
 
             # store result
             self.power_values.append(power)

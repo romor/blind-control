@@ -34,7 +34,7 @@ class SunPower(StandardScript):
                                        self.config['OPC_STORAGE']['password'])
                                        
         # setup power calculator
-        self.calculator = PowerCalculator()
+        self.calculator = PowerCalculator(self.config)
 
         
     def process(self):

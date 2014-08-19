@@ -1,66 +1,68 @@
 {
-	"LOGGING": {
-		"log_dir": "/var/log",
-		"log_level_console": "debug",
-		"log_level_file": "info"
-	},
-	
-	"EMAIL": {
-		"_comment": "configure your IMAP email server here",
-		"servername": "imap_server_name.com",
-		"username": "user_name",
-		"password": "123456",
-		"_comment_deleteAfterProcessing": "0..no deletion; 1..delete all; 2..delete but keep last",
-		"deleteAfterProcessing": 0,
-		"expungeMailbox": 1,
-		"subject": "[weather data]"
-	},
-	
-	"OPC_STORAGE": {
-		"enabled": 0,
-		"url": "http://opcserver.com:8080/DA",
-		"password": "123456",
-		"tag_temperature": "Temperature",
-		"tag_sunpower": "SunPower",
-		"tag_control": "OutputStatus"
-	},
-	
-	"FILE_STORAGE": {
-		"enabled": 1,
-		"filename": "/tmp/blind-control.data"
-	},
-	
-	"CONTROL": {
-		"weather_threshold": 0.1,
-		"angle_threshold": 0.2
-	},
-	
-	
-	"REMOTES": {
-		"_comment": "define your remote(s) here and assign RPi pins to the buttons",
-		"north": {
-			"channel": 16,
-			"up": 18,
-			"down": 22,
-			"my": 26
-		},
-		"south": {
-			"channel": 3,
-			"up": 5,
-			"down": 7,
-			"my": 11
-		}
-	},
-	
+    "LOGGING": {
+        "log_dir": "/var/log",
+        "log_level_console": "debug",
+        "log_level_file": "info"
+    },
+    
+    "EMAIL": {
+        "_comment": "configure your IMAP email server here",
+        "servername": "imap_server_name.com",
+        "username": "user_name",
+        "password": "123456",
+        "_comment_deleteAfterProcessing": "0..no deletion; 1..delete all; 2..delete but keep last",
+        "deleteAfterProcessing": 0,
+        "expungeMailbox": 1,
+        "subject": "[weather data]"
+    },
+    
+    "OPC_STORAGE": {
+        "enabled": 0,
+        "url": "http://opcserver.com:8080/DA",
+        "password": "123456",
+        "tag_temperature": "Temperature",
+        "tag_sunpower": "SunPower",
+        "tag_control": "OutputStatus"
+    },
+    
+    "FILE_STORAGE": {
+        "enabled": 1,
+        "filename": "/tmp/blind-control.data"
+    },
+    
+    "CONTROL": {
+        "weather_threshold": 0.1,
+        "angle_threshold": 0.2,
+        "min_altitude": 1.0,
+        "max_angle": 80
+    },
+    
+    
+    "REMOTES": {
+        "_comment": "define your remote(s) here and assign RPi pins to the buttons",
+        "north": {
+            "channel": 16,
+            "up": 18,
+            "down": 22,
+            "my": 26
+        },
+        "south": {
+            "channel": 3,
+            "up": 5,
+            "down": 7,
+            "my": 11
+        }
+    },
+    
     "AZIMUTH_BASE": 0,
-	
+    
     "WINDOWS": [
         {
             "name": "Window 1",
             "geo": { "alt": 0, "az": 90},
-			"opc": { "power": 4, "ctrl": 0},
-			"remote": { "id": "north", "channel": 0 },
-			"down_cmd": "my"
+            "opc": { "power": 4, "ctrl": 0},
+            "remote": { "id": "north", "channel": 0 },
+            "down_cmd": "my"
         }
     ]
 }
