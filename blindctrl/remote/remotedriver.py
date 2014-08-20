@@ -60,6 +60,8 @@ class RemoteDriver(threading.Thread):
     def set_channel(self, channel):
         # do we need to switch?
         if self.cur_channel != channel:
+            # it will then output low level, which equals a button press
+            logging.getLogger().debug("Set channel to {}.".format(channel))
             # how many channels to switch? this works also fine for negative numbers
             channel_diff = (channel - self.cur_channel) % self.NR_CHANNELS
             # we need 1 press more than the channel difference
@@ -74,6 +76,7 @@ class RemoteDriver(threading.Thread):
     def invoke_cmd(self, cmd):
         # the command may be disabled
         if cmd:
+            logging.getLogger().debug("Invoke cmd {}.".format(cmd))
             self.switch_pin(self.remote_config[cmd])
 
 
@@ -82,6 +85,7 @@ class RemoteDriver(threading.Thread):
             # Pin ON
             # to turn a button on we just need to set the GPIO to output
             # it will then output low level, which equals a button press
+            logging.getLogger().debug("{} pin {}: ON".format(self.remote_name, pin_nr))
             GPIO.setup(pin_nr, GPIO.OUT)
             # delay
             time.sleep(self.BUTTON_HOLD)
@@ -89,6 +93,7 @@ class RemoteDriver(threading.Thread):
             # Pin OFF
             # accordingly, to turn a button of we configure the GPIO to input
             # the high impetance state equals no button press
+            logging.getLogger().debug("{} pin {}: OFF".format(self.remote_name, pin_nr))
             GPIO.setup(pin_nr, GPIO.IN)
             # delay
             time.sleep(self.BUTTON_TIMEOUT)

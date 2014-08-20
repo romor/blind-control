@@ -45,9 +45,9 @@ class CommandCtrl:
         for i in range(len(self.cmds)):
             if self.cmds[i]['id'] == id:
                 remote_id = i
-                
+
         # create new remote?
-        if not remote_id:
+        if remote_id is None:
             self.cmds.append({
                 'id': id,
                 'cmds' : [],
