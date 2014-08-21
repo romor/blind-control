@@ -37,7 +37,7 @@
 <p>This project is about electrically controlled roller shutters and motorized blinds. These are controlled with the Somfy RTS RF remote control system. In summer time, I like to automatically control the blinds such that they close if significant sun light would come insight and open again if direct sun light is over again.
 Since the blinds are located at different angles on different sides of the house I need individual control of the blinds, depending on their position.
 Also I want to maximize the opening time to have it as bright as possible insight. However, if the sun shines directly into a window the blind must be down to avoid overheating of the house.
-As a result, each blind shall only close if the sun has an angle for direct radiation. If possible the blind should also not close if the sky is cloudy and no direct sun light prevails.</p>
+As a result, each blind shall only close if the sun has an angle for direct radiation. Further more, the blind should also not close if the sky is cloudy and no direct sun light prevails.</p>
 
 <h1>
 <a name="possible-solutions" class="anchor" href="#possible-solutions"><span class="octicon octicon-link"></span></a>Possible solutions</h1>
@@ -47,7 +47,7 @@ The following alternatives were considered by me:
 
 
 <h3>1. Use Somfy Timer Unit</h3>
-<p>Somfy offers a timer control for their systems such as Chronis Comfort RTS Timer.</p>
+<p>Somfy offers a timer control for their systems such as Chronis Comfort RTS Timer. You can program a specific time for opening and closing of the blinds. This time can also depend on sunrise and sunset. But this is limited to +/- 1 hour around sunrise and sunset and therefore only hardly suitable.</p>
 <p><img src="images/somfy_chronis.jpg" alt="Chronis Comfort RTS Timer"></p>
 
 <p><strong>Advantages</strong></p>
@@ -114,14 +114,23 @@ The following alternatives were considered by me:
 </ul>
 <p>Refer to the Excel spreadsheat for concrete pin numbering.</p>
 
+<p>Notice that the Somfy Telis remote is powered by the Raspberry Pi. Its battery is removed and the contacts are connected to the 3.3 V supply of the RPi. There are 2 good places to put the supply wires on, with wholes where they can easily be soldered.<p>
+
 <p>The total setup including the Raspberry Pi is shown here:</p>
 <p><img src="images/assembly.jpg" alt="Somfy Telis assembled to Raspberry Pi"></p>
+
+<p>Finally I attached 2 Telis remotes to increase the number of contrallable channels to 10. The RPi provides enough GPIOs such that you could also operate 3 remotes.</p>
+
+<p>For your reference: I found a similar approach in the OpenRemote project in this article:<br>
+<a href="http://www.openremote.org/display/docs/OpenRemote+2.0+How+To+-+Control+Sunshades+-+Somfy+with+Raspberry+Pi">How To - Control Sunshades - Somfy-Telis with Raspberry Pi</a></p>
+
+<p>This project uses an opto coupler, which is connected between the Telis remote and the Raspberry Pi. I do not see a reason for this as the RPi uses the same voltage range as the Telis remote and a galvanic separation does not seem necessary to me. This simplifies my hardware setup such that no component is needed beside the RPi and the Somfy Telis remote. Also, you do not need to worry about the remote's battery anymore since this is removed and supplied by the Raspberry Pi, too.</p>
 
 
 <h1>
 <a name="software" class="anchor" href="#software"><span class="octicon octicon-link"></span></a>Software</h1>
 
-<p>We have various software components involved:</p>
+<p>The software is developed in Python and consists of several independent software components, which are outlined below.</p>
 
 <h2>
 <a name="weather-data-retrieval" class="anchor" href="#weather-data-retrieval"><span class="octicon octicon-link"></span></a>Weather Data Retrieval</h2>
@@ -129,24 +138,25 @@ The following alternatives were considered by me:
 <p>This component determines the outside temperature and the probability of sun shine in near future. You need some weather service to provide this data. Normally you should be able to find some public web side to access for current temperature and sun minutes per hour at your location. I was lucky and my local meteorological institute offered me also forecast data, which I receive regularly in CSV format per email.</p>
 
 <p>Thus I developed a Python script that retrieves the email from my personal email account and parses the weather data. The extracted sun shine probability and the outside temperature is then stored to an OPC server.
-This storage to an OPC XML-DA server mainly has historical reason because I have such system available (Loytec LINX 120). Alternatively it is also stored to a file.
-Look at the zamg component in the git repository for this functionality.</p>
+This storage to an OPC XML-DA server is mainly caused by historical reason because I have such system available (Loytec LINX 120). Additionally it is also stored to a file so you do not need the extra HW to run the system.
+Look at the <a href="https://github.com/romor/blind-control/tree/master/blindctrl/zamg">zamg component</a> in the git repository for this functionality.</p>
 
 <h2>
 <a name="sun-power-calculation" class="anchor" href="#sun-power-calculation"><span class="octicon octicon-link"></span></a>Window Power Calculation</h2>
 
-<p>This component derives the power of the sun as perceived for each individual window. It derives the current position of the sun on horizon (azimuth, altitude) and the angle of the sun light to each window. Based on this angle it derives the effective sun power for each window. Again, this is stored using an OPC datapoint and in a file.
-Look at the sunpower component in the git repository for this functionality.</p>
+<p>This component derives the power of the sun as perceived for each individual window. It derives the current position of the sun on horizon (azimuth, altitude) and the angle of the sun light to each window. Based on this angle it derives the effective sun power for each window. Again, this is stored using an OPC datapoint and additionally into a file.
+Look at the <a href="https://github.com/romor/blind-control/tree/master/blindctrl/sunpower">sunpower component</a> in the git repository for this functionality.</p>
 
 <h2>
 <a name="command-control" class="anchor" href="#command-control"><span class="octicon octicon-link"></span></a>Command Control</h2>
 
-<p>This component derives the up and down commands for the blinds. It compares the sun power from weather servie and the effective radiation angle from each window with threshold parameters. If the threshold is reached the desired state of the window is set to closed.</p>
+<p>This <a href="https://github.com/romor/blind-control/tree/master/blindctrl/commander">component</a> derives the up and down commands for the blinds. It compares the sun power from weather service and the effective radiation angle from each window with threshold parameters. If the threshold is reached the desired state of the window is set to closed.</p>
 
 <h2>
 <a name="remote-control-driver" class="anchor" href="#remote-control-driver"><span class="octicon octicon-link"></span></a>Remote Control Driver</h2>
 
-<p>This component reads the desired switching status from the OPC data point or file storage and compares it with the current status, which is also stored via OPC or file. If the status differs it triggers the command on the Telis remote. For this it needs to switch to the corresponding RF channel and issue the open or close command afterwards. Finally it switches the RF channel back to channel 1. The driver also makes sure that all blinds are operated sequentially even if the status changes simultanuous. This is necessary because the single Telis remote control can just operate on the currently selected channel.</p>
+<p>This component reads the desired switching status from the OPC data point or file storage and compares it with the current status, which is read from a file. If the status differs it triggers the command on the Telis remote. For this it needs to switch to the corresponding RF channel and issue the open or close command afterwards. Finally it switches the RF channel back to channel 0. The driver also makes sure that all blinds are operated sequentially even if the status changes simultanuous. This is necessary because the single Telis remote control can just operate on the currently selected channel.</p>
+<p>Multiple commands on the same remote are scheduled in ordered sequence to optimize channel switching delays. If multiple remotes are used they are handled in different concurrent threads such that also this timing gets optimized. The <a href="https://github.com/romor/blind-control/tree/master/blindctrl/remote">remote component</a> in the git repository covers this functionality.</p>
 
       </section>
     </div>
