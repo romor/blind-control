@@ -105,12 +105,15 @@ The following alternatives were considered by me:
 <p>The Somfy Telis 5 RTS provides the interface to the radio signal. I use this unit as it is and just solder wires to the button lines to control them automatically. The buttons seem to be connected to pull up resistors and close contact to ground if pressed. Therefore, I soldered wires to each button and the GND connection:</p>
 <p><img src="images/soldering_2.jpg" alt="soldered wires on Somfy Telis"></p>
 
-<p>These wires are connected to the GPIO interface of a Raspberry Pi. So the wiring is like this:</p>
+<p>These wires are connected to the GPIO interface of a Raspberry Pi. To simulate a button press, the GPIO pin of the RPi is set to zero, to release the button again the GPIO pin is set to high impedance state (thus reconfigured as input).</p>
+
+<p>As a result, the wiring is like this:</p>
 
 <ul>
+<li>Telis Buttons &lt;-&gt; RPi GPIOs</li>
+<li>...</li>
 <li>Telis Battery - &lt;-&gt; RPi GND</li>
 <li>Telis Battery + &lt;-&gt; RPi 3.3 V</li>
-<li>Telis Buttons &lt;-&gt; RPi GPIOs</li>
 </ul>
 <p>Refer to the Excel spreadsheat for concrete pin numbering.</p>
 
