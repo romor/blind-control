@@ -5,6 +5,7 @@
 import sys
 import logging
 import traceback
+import time
 
 # self-defined modules
 from blindctrl.shared.stdscript import StandardScript
@@ -21,6 +22,10 @@ Derive switching commands and operates remote controls accordingly.
 
 
 class RemoteCtrl(StandardScript):
+    # time delay between invoking remote threads
+    REMOTE_THREAD_DELAY = 0.15    # seconds
+
+
     def __init__(self):
         # call parent constructor
         super().__init__()
@@ -48,6 +53,10 @@ class RemoteCtrl(StandardScript):
                     # invoke background thread to control the remote
                     driver.start()
                     drivers_running.append(driver)
+
+                    # delay to have next remote started acyclic
+                    # to avoid same time RF commands
+                    time.sleep(self.REMOTE_THREAD_DELAY)
 
                 # wait until remote threads are finished
                 for cur_thread in drivers_running:
