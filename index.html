@@ -48,7 +48,7 @@ The following alternatives were considered by me:
 
 <h3>1. Use Somfy Timer Unit</h3>
 <p>Somfy offers a timer control for their systems such as Chronis Comfort RTS Timer. You can program a specific time for opening and closing of the blinds. This time can also depend on sunrise and sunset. But this is limited to +/- 1 hour around sunrise and sunset and therefore only hardly suitable.</p>
-<p><img src="images/somfy_chronis.jpg" alt="Chronis Comfort RTS Timer"></p>
+<p><img src="images/somfy_chronis.png" alt="Chronis Comfort RTS Timer"></p>
 
 <p><strong>Advantages</strong></p>
 
@@ -65,7 +65,7 @@ The following alternatives were considered by me:
 
 <h3>2. Somfy Universial RTS Interface</h3>
 <p>Somfy offers a universal interface, which provides a RS485 communication interface. It is able to serve multiple channels so each blind could be controlled individually.</p>
-<p><img src="images/somfy_rs485.jpg" alt="Somfy Universal Interface"></p>
+<p><img src="images/somfy_rs485.png" alt="Somfy Universal Interface"></p>
 
 <p><strong>Advantages</strong></p>
 
@@ -82,7 +82,7 @@ The following alternatives were considered by me:
 
 <h3>3. Build my own Interface</h3>
 <p>The Somfy Telis 4 RTS is available for reasonable budget and offers 5 channels. If the button contact can be closed by some software controlled unit with ethernet interface I have all I need. This can easily be done using a Raspberry Pi.</p>
-<p><img src="images/somfy_telis_4.jpg" alt="Somfy Telis 4"> <img src="images/raspberry_pi.jpg" alt="Raspberry Pi"></p>
+<p><img src="images/somfy_telis_4.png" alt="Somfy Telis 4"> <img src="images/raspberry_pi.jpg" alt="Raspberry Pi"></p>
 
 <p><strong>Advantages</strong></p>
 <ul>
@@ -115,9 +115,9 @@ The following alternatives were considered by me:
 <li>Telis Battery - &lt;-&gt; RPi GND</li>
 <li>Telis Battery + &lt;-&gt; RPi 3.3 V</li>
 </ul>
-<p>Refer to the Excel spreadsheat for concrete pin numbering.</p>
+<p>Refer to the Excel sheet in the git <a href="https://github.com/romor/blind-control/tree/master/doc">documentation directory</a> for concrete pin numbering.</p>
 
-<p>Notice that the Somfy Telis remote is powered by the Raspberry Pi. Its battery is removed and the contacts are connected to the 3.3 V supply of the RPi. There are 2 good places to put the supply wires on, with wholes where they can easily be soldered.<p>
+<p>Notice that the Somfy Telis remote is powered by the Raspberry Pi. Its battery is removed and the contacts are connected to the 3.3 V supply of the RPi. There are 2 good places to put the supply wires on, with holes where they can easily be soldered.<p>
 
 <p>The total setup including the Raspberry Pi is shown here:</p>
 <p><img src="images/assembly.jpg" alt="Somfy Telis assembled to Raspberry Pi"></p>
