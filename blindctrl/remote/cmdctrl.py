@@ -22,7 +22,7 @@ class CommandCtrl:
         # clear potentially existing commands
         del self.cmds[:]
         # switching_cmds has following structure:
-        # [ { 'remote', 'cmd' } ]
+        # [ { 'remote': {"id", "channel"}, 'cmd' } ]
 
         # loop through all commands
         for cmd in switching_cmds:

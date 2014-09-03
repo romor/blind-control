@@ -6,6 +6,8 @@ import sys
 import logging
 import traceback
 import time
+import atexit
+import RPi.GPIO as GPIO
 
 # self-defined modules
 from blindctrl.shared.stdscript import StandardScript
@@ -23,7 +25,8 @@ Derive switching commands and operates remote controls accordingly.
 
 class RemoteCtrl(StandardScript):
     # time delay between invoking remote threads
-    REMOTE_THREAD_DELAY = 0.15    # seconds
+    # this inhibits synchronous RF commands which conflicts with supply power
+    REMOTE_THREAD_DELAY = 2    # seconds
 
 
     def __init__(self):
@@ -32,6 +35,13 @@ class RemoteCtrl(StandardScript):
         
         # initialize working classes
         self.state_ctrl = StateCtrl(self.config)
+        
+        # setup RPi
+        # don't do this in RemoteDriver because this has multiple instances
+        # use P1 header pin numbering convention
+        GPIO.setmode(GPIO.BOARD)
+        # reset all pins to inputs at exit
+        atexit.register(GPIO.cleanup)
 
 
     def process(self):

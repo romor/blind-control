@@ -62,6 +62,7 @@ class StandardScript:
         # create formatter and add it to the handlers
         formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
         log_file.setFormatter(formatter)
+        log_console.setFormatter(formatter)
 
         # add the handlers to the logger
         logging.getLogger().addHandler(log_file)
