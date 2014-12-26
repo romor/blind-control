@@ -21,6 +21,8 @@ Sets the time of local sunset to an OPC data point.
 
 
 class Astrotime(StandardScript):
+    HORIZON = '-7'    # -6=civil twilight
+
     def __init__(self):
         # call parent constructor
         super().__init__()
@@ -39,7 +41,7 @@ class Astrotime(StandardScript):
             o = ephem.Observer()
             # Vienna: 48 degree north; 16 degree east
             o.lat, o.long, o.date = '48:13', '16:22', datetime.datetime.utcnow()
-            o.horizon = '-6'    # -6=civil twilight
+            o.horizon = self.HORIZON
             sunset = ephem.localtime(o.next_setting(ephem.Sun()))
             logging.getLogger().info("Setting sunset to {}".format(sunset.strftime("%H:%M:%S")))
             

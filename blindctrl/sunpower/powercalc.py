@@ -9,9 +9,6 @@ import math
 
 
 class PowerCalculator():
-    MIN_ALTITUDE = 1
-    ANGLE_LIMIT  = 80
-
     def __init__(self, config):
         self.config = config
         self.power_values = []
