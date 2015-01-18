@@ -28,22 +28,38 @@ class StateCtrl:
         if self.config['OPC_STORAGE']['enabled']:
             self.read_opc()
 
-
         # determine switching commands
         for i in range(len(self.config['WINDOWS'])):
+        
+            # switching necessary?
             if self.current_states[i] != self.desired_states[i]:
+                window_cfg = self.config['WINDOWS'][i]
+                
                 # determine command type
                 if self.desired_states[i]:
-                    cmd = self.config['WINDOWS'][i]['down_cmd']
+                    # down command
+                    if 'down_cmd' in window_cfg:
+                        cmd = window_cfg['down_cmd']
+                    else:
+                        cmd = "down"
                 else:
-                    cmd = "up"
-                logging.getLogger().info("Switching {} to {}.".format(
-                        self.config['WINDOWS'][i]['name'], cmd))
-                # store command
-                self.cmds.append({
-                    'remote': self.config['WINDOWS'][i]['remote'],
-                    'cmd': cmd,
-                })
+                    # up command
+                    if 'up_cmd' in window_cfg:
+                        cmd = window_cfg['up_cmd']
+                    else:
+                        cmd = "up"
+                
+                # command may be disabled by config file
+                if cmd is not None:
+                    logging.getLogger().info("Switching {} to {}.".format(
+                            window_cfg['name'], cmd))
+                    # store command
+                    self.cmds.append({
+                        'remote': window_cfg['remote'],
+                        'cmd': cmd,
+                    })
+                else:
+                    logging.getLogger().info("Skipping command for {}.".format(window_cfg['name']))
 
 
     def read_file(self):
