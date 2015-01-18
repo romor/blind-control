@@ -48,6 +48,11 @@ class StandardScript:
 
     def init_logging(self):
         """setup logging to file and console"""
+        # check if logging is already configured
+        if len(logging.getLogger().handlers) > 0:
+            logging.getLogger().debug('skip logging setup since loggers are already present')
+            return  # logging already configured
+
         # setup root logger
         # we assume a higher log level on console logger
         logging.getLogger().setLevel(self.config['LOGGING']['log_level_console'].upper())
