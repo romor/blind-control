@@ -5,6 +5,7 @@ Since the blinds are located at different angles on different sides of the house
 Also I want to maximize the opening time to have it as bright as possible insight. However, if the sun shines directly into a window the blind must be down to avoid overheating of the house.
 As a result, each blind shall only close if the sun has an angle for direct radiation. If possible the blind should also not close if the sky is cloudy and no direct sun light prevails.
 
-Please see the project website for more information.
+Please see the project website for more information:
+http://romor.github.io/blind-control
 
 Copyright (C) 2014, Roman Morawek
