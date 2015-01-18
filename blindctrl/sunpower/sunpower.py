@@ -75,9 +75,9 @@ class SunPower(StandardScript):
             config.read(self.config['FILE_STORAGE']['filename'])
             
         # recreate data of this script
-        config[self.scriptname] = {}
+        config['sunpower'] = {}
         for i in range(len(self.config['WINDOWS'])):
-            config[self.scriptname][self.config['WINDOWS'][i]['name']] = \
+            config['sunpower'][self.config['WINDOWS'][i]['name']] = \
                                         str(self.calculator.power_values[i])
                                         
         # save data file

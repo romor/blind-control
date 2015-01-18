@@ -28,6 +28,9 @@ class StateCtrl:
         if self.config['OPC_STORAGE']['enabled']:
             self.read_opc()
 
+        # clear switching commands, if already set
+        del self.cmds[:]
+
         # determine switching commands
         for i in range(len(self.config['WINDOWS'])):
         
