@@ -79,7 +79,12 @@ class OpcClient():
         item_list = root[0][0][1]
         values = []
         for item in item_list:
-            values.append(item[0].text)
+            if len(item):
+                values.append(item[0].text)
+            else:
+                # probably inexisting opc item
+                logging.getLogger().error("Opc read error.")
+                values.append(None)
 
 		# call notification handler
         #callback(values, callback_arguments)
