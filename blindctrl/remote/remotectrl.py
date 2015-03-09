@@ -83,6 +83,9 @@ class RemoteCtrl(StandardScript):
             logging.getLogger().error(traceback.format_exc())
             raise
 
+        # return the number of executed remote commands
+        return len(self.state_ctrl.cmds)
+
 
 if __name__ == "__main__":
     # init functionality

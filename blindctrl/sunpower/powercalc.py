@@ -86,10 +86,5 @@ class PowerCalculator():
             # store result
             self.power_values.append(power)
             # perform logging
-            if power > 0:
-                logging.getLogger().info("{}: angle: {:0.0f}, power: {:0.2f}".format(
-                    window['name'], angle*180/math.pi, power))
-            else:
-                logging.getLogger().debug("{}: angle: {:0.0f}, power: {:0.2f}".format(
-                    window['name'], angle*180/math.pi, power))
-
+            logging.getLogger().debug("{}: angle: {:0.0f}, power: {:0.2f}".format(
+                window['name'], angle*180/math.pi, power))

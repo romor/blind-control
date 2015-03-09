@@ -72,7 +72,10 @@ class SunPower(StandardScript):
         config = configparser.ConfigParser()
         # read existing file data
         if os.path.isfile(self.config['FILE_STORAGE']['filename']):
-            config.read(self.config['FILE_STORAGE']['filename'])
+            try:
+                config.read(self.config['FILE_STORAGE']['filename'])
+            except configparser.ParsingError as e:
+                logging.getLoger().error("Error parsing file storage: " + str(e))
             
         # recreate data of this script
         config['sunpower'] = {}
