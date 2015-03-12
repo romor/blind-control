@@ -70,7 +70,7 @@ class StateCtrl:
         try:
             config.read(self.config['FILE_STORAGE']['filename'])
         except configparser.ParsingError as e:
-            logging.getLoger().error("Error parsing file storage: " + str(e))
+            logging.getLogger().error("Error parsing file storage: " + str(e))
 
         # clear data array, if already filled
         del self.current_states[:]
@@ -123,7 +123,7 @@ class StateCtrl:
             try:
                 config.read(self.config['FILE_STORAGE']['filename'])
             except configparser.ParsingError as e:
-                logging.getLoger().error("Error parsing file storage: " + str(e))
+                logging.getLogger().error("Error parsing file storage: " + str(e))
 
         # recreate data of this script
         config['statectrl'] = {}

@@ -75,7 +75,7 @@ class SunPower(StandardScript):
             try:
                 config.read(self.config['FILE_STORAGE']['filename'])
             except configparser.ParsingError as e:
-                logging.getLoger().error("Error parsing file storage: " + str(e))
+                logging.getLogger().error("Error parsing file storage: " + str(e))
             
         # recreate data of this script
         config['sunpower'] = {}
