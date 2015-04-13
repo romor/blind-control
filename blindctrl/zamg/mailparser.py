@@ -79,6 +79,9 @@ class MailParser():
         # loop through attachments
         for attachment in mail_parts:
             csv = attachment.get_payload()
+            # dump file
+            with open(attachment.get_filename(), "w") as text_file:
+                text_file.write(csv)
 
             # notify listener on new data
             for observer in self._csvobservers:

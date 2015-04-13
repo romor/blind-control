@@ -30,6 +30,12 @@ def run_setup(args):
         install_requires=REQUIRES,
         script_name = 'setup.py',
         script_args = args,
+        entry_points={
+            'console_scripts': [
+                'zamg=blindctrl.zamg.zamg:main',
+                'astrotime=blindctrl.sunpower.astrotime:main',
+            ],
+        },
     )
 
 

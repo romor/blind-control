@@ -63,12 +63,16 @@ class Astrotime(StandardScript):
         self.opcclient.write(opc_tags, types, values)
 
 
-if __name__ == "__main__":
+def main():
+    """entry point if called as an executable"""
     # init functionality
     astrotime = Astrotime()
-
+    # derive time
+    astrotime.process()
+    
+if __name__ == "__main__":
     if len(sys.argv) == 1:
-        # derive time
-        astrotime.process()
+        # main entry point
+        main()
     else:
-        print(usage.format(name=astrotime.scriptname))
+        print(usage.format(name="astrotime"))

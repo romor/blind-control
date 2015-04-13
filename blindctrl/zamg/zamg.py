@@ -112,16 +112,22 @@ class Zamg(StandardScript):
                 self.set_file(self.data['temperature'], self.data['sun']/60)
 
 
-if __name__ == "__main__":
+def main():
+    """main entry point"""
     # init functionality
     zamg = Zamg()
+    # fetch csv files from email server
+    zamg.process_mail()
+    zamg.process_data()
 
+if __name__ == "__main__":
     if len(sys.argv) == 1:
-        # fetch csv files from email server
-        zamg.process_mail()
-        zamg.process_data()
+        # main entry point
+        main()
 
     elif len(sys.argv) == 2:
+        # init functionality
+        zamg = Zamg()
         # parse file given on command line
         logging.getLogger().info("Importing file " + sys.argv[1])
         if os.path.isfile(sys.argv[1]):
@@ -131,4 +137,4 @@ if __name__ == "__main__":
             logging.getLogger().error("Import file not found.")
 
     else:
-        print(usage.format(name=zamg.scriptname))
+        print(usage.format(name="zamg"))
