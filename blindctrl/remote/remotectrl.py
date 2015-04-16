@@ -44,10 +44,10 @@ class RemoteCtrl(StandardScript):
         atexit.register(GPIO.cleanup)
 
 
-    def process(self, current_state = None, desired_state = None):
+    def process(self, desired_state = None):
         try:
             # read desired state switches
-            self.state_ctrl.get_switching_commands(current_state, desired_state)
+            self.state_ctrl.get_switching_commands(desired_state)
 
             # are switching commands necessary?
             if len(self.state_ctrl.cmds):
@@ -77,7 +77,7 @@ class RemoteCtrl(StandardScript):
 
             # store desired states
             # we do this even if we did not switch anything to initialize the storage if needed
-            self.state_ctrl.store_new_states()
+            self.state_ctrl.store_desired_states()
 
         except Exception as e:
             logging.getLogger().error(traceback.format_exc())
@@ -87,12 +87,16 @@ class RemoteCtrl(StandardScript):
         return len(self.state_ctrl.cmds)
 
 
-if __name__ == "__main__":
+def main():
     # init functionality
     remote_ctrl = RemoteCtrl()
 
+    # derive all desired blind states
+    remote_ctrl.process()
+
+if __name__ == "__main__":
     if len(sys.argv) == 1:
-        # derive all desired blind states
-        remote_ctrl.process()
+        # run main entry point
+        main()
     else:
-        print(usage.format(name=remote_ctrl.scriptname))
+        print(usage.format(name="remotectrl"))

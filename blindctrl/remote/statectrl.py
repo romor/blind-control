@@ -16,22 +16,25 @@ class StateCtrl:
         # store configuration
         self.config = config
 
+        # read current blind states
+        self.current_states = self._read_current_state()
+
         # initialize data storage
-        self.current_states = []
         self.desired_states = []
         self.cmds = []
+        
 
-
-    def get_switching_commands(self, current_state = None, desired_state = None):
-        if current_state is None:
-            # read current and desired states
-            self.read_file()
+    def get_switching_commands(self, desired_state = None):
+        if desired_state is None:
+            # read desired states from file or OPC
             if self.config['OPC_STORAGE']['enabled']:
-                self.read_opc()
+                self.desired_states = self._read_opc()
+            else:
+                self.desired_states = self._read_desired_state()
         else:
-            # take parameters for state information
-            self.current_states = current_state
+            # take commands provided via parameter
             self.desired_states = desired_state
+        assert len(self.current_states) == len(self.desired_states) == len(self.config['WINDOWS'])
 
         # clear switching commands, if already set
         del self.cmds[:]
@@ -70,16 +73,15 @@ class StateCtrl:
                     logging.getLogger().info("Skipping command for {}.".format(window_cfg['name']))
 
 
-    def read_file(self):
+    def _read_current_state(self):
         config = configparser.ConfigParser()
         try:
             config.read(self.config['FILE_STORAGE']['filename'])
         except configparser.ParsingError as e:
             logging.getLogger().error("Error parsing file storage: " + str(e))
 
-        # clear data array, if already filled
-        del self.current_states[:]
-        del self.desired_states[:]
+        # create data array
+        current_states = []
         
         for window in self.config['WINDOWS']:
             # process current states
@@ -87,8 +89,22 @@ class StateCtrl:
                 state = int(config['statectrl'][window['name']])
             except KeyError:
                 state = 0
-            self.current_states.append(state)
-            
+            current_states.append(state)
+
+        return current_states
+
+
+    def _read_desired_states(self):
+        config = configparser.ConfigParser()
+        try:
+            config.read(self.config['FILE_STORAGE']['filename'])
+        except configparser.ParsingError as e:
+            logging.getLogger().error("Error parsing file storage: " + str(e))
+
+        # create data array
+        desired_states = []
+        
+        for window in self.config['WINDOWS']:
             # process desired states
             try:
                 state = int(config['commander'][window['name']])
@@ -98,10 +114,13 @@ class StateCtrl:
                     logging.getLogger().error("No command state present for {}."\
                                 .format(window['name']))
                 state = 0
-            self.desired_states.append(state)
+            desired_states.append(state)
+        
+        return desired_states
 
 
-    def read_opc(self):
+    def _read_opc(self):
+        desired_states = []
         opcclient = OpcClient(self.config['OPC_STORAGE']['url'],
                               self.config['OPC_STORAGE']['password'])
         opc_tags = [
@@ -115,13 +134,16 @@ class StateCtrl:
             ctrl_id = self.config['WINDOWS'][i]['opc']['ctrl']
             try:
                 state = int(value[2*ctrl_id:2*ctrl_id+2])
-                self.desired_states[i] = state
             except KeyError:
                 logging.getLogger().error("Error getting state for window {}, {}"\
                         .format(ctrl_id, self.config['WINDOWS'][i]['name']))
+                state = 0
+            desired_states.append(state)
+        
+        return desired_states
 
 
-    def store_new_states(self):
+    def store_desired_states(self):
         config = configparser.ConfigParser()
         # read existing file data
         if os.path.isfile(self.config['FILE_STORAGE']['filename']):
@@ -133,6 +155,9 @@ class StateCtrl:
         # recreate data of this script
         config['statectrl'] = {}
         for i in range(len(self.config['WINDOWS'])):
+            # store class member
+            self.current_states[i] = self.desired_states[i]
+            # store in file
             config['statectrl'][self.config['WINDOWS'][i]['name']] = \
                                         str(int(self.desired_states[i]))
 

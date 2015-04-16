@@ -34,6 +34,7 @@ def run_setup(args):
             'console_scripts': [
                 'zamg=blindctrl.zamg.zamg:main',
                 'astrotime=blindctrl.sunpower.astrotime:main',
+                'remotectrl=blindctrl.remote.remotectrl:main',
             ],
         },
     )
