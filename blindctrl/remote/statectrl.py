@@ -144,23 +144,35 @@ class StateCtrl:
 
 
     def store_desired_states(self):
-        config = configparser.ConfigParser()
-        # read existing file data
-        if os.path.isfile(self.config['FILE_STORAGE']['filename']):
-            try:
-                config.read(self.config['FILE_STORAGE']['filename'])
-            except configparser.ParsingError as e:
-                logging.getLogger().error("Error parsing file storage: " + str(e))
-
-        # recreate data of this script
-        config['statectrl'] = {}
+        # update class member
+        has_changed = False
         for i in range(len(self.config['WINDOWS'])):
-            # store class member
-            self.current_states[i] = self.desired_states[i]
-            # store in file
-            config['statectrl'][self.config['WINDOWS'][i]['name']] = \
-                                        str(int(self.desired_states[i]))
+            if self.current_states[i] != self.desired_states[i]:
+                has_changed = True
+                self.current_states[i] = self.desired_states[i]
+        
+        if has_changed:
+            # update file storage
+            config = configparser.ConfigParser()
+            # read existing file data
+            if os.path.isfile(self.config['FILE_STORAGE']['filename']):
+                try:
+                    config.read(self.config['FILE_STORAGE']['filename'])
+                except configparser.ParsingError as e:
+                    logging.getLogger().error("Error parsing file storage: " + str(e))
 
-        # save data file
-        with open(self.config['FILE_STORAGE']['filename'], 'w') as configfile:
-            config.write(configfile)
+            # recreate data of this script
+            config['statectrl'] = {}
+            for i in range(len(self.config['WINDOWS'])):
+                if self.current_states[i] != self.desired_states[i]:
+                    has_changed = True
+                    # store class member
+                    self.current_states[i] = self.desired_states[i]
+
+                # store in file
+                config['statectrl'][self.config['WINDOWS'][i]['name']] = \
+                                            str(int(self.desired_states[i]))
+
+            # save data file
+            with open(self.config['FILE_STORAGE']['filename'], 'w') as configfile:
+                config.write(configfile)
