@@ -22,11 +22,16 @@ class StateCtrl:
         self.cmds = []
 
 
-    def get_switching_commands(self):
-        # read current and desired states
-        self.read_file()
-        if self.config['OPC_STORAGE']['enabled']:
-            self.read_opc()
+    def get_switching_commands(self, current_state = None, desired_state = None):
+        if current_state is None:
+            # read current and desired states
+            self.read_file()
+            if self.config['OPC_STORAGE']['enabled']:
+                self.read_opc()
+        else:
+            # take parameters for state information
+            self.current_states = current_state
+            self.desired_states = desired_state
 
         # clear switching commands, if already set
         del self.cmds[:]

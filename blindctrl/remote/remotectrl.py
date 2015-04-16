@@ -44,10 +44,10 @@ class RemoteCtrl(StandardScript):
         atexit.register(GPIO.cleanup)
 
 
-    def process(self):
+    def process(self, current_state = None, desired_state = None):
         try:
             # read desired state switches
-            self.state_ctrl.get_switching_commands()
+            self.state_ctrl.get_switching_commands(current_state, desired_state)
 
             # are switching commands necessary?
             if len(self.state_ctrl.cmds):
