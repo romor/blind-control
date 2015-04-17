@@ -51,6 +51,8 @@ class SunPower(StandardScript):
         except Exception as e:
             logging.getLogger().error(traceback.format_exc())
             raise
+            
+        return self.calculator.power_values
 
 
     def save_opc(self):
@@ -61,12 +63,14 @@ class SunPower(StandardScript):
         
         # setup values
         for i in range(len(self.config['WINDOWS'])):
-            opc_tags.append(self.config['WINDOWS'][i]['opc']['power'])
-            types.append('float')
-            values.append(self.calculator.power_values[i])
+            if self.config['WINDOWS'][i]['opc']['power'] is not None:
+                opc_tags.append(self.config['WINDOWS'][i]['opc']['power'])
+                types.append('float')
+                values.append(self.calculator.power_values[i])
 
         # write data to OPC
-        self.opcclient.write(opc_tags, types, values)
+        if len(opc_tags) > 0:
+            self.opcclient.write(opc_tags, types, values)
 
     def save_file(self):
         config = configparser.ConfigParser()
