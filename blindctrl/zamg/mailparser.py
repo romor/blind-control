@@ -40,7 +40,7 @@ class MailParser():
         for msgid in messages:
             # download it
             response = server.fetch(msgid, ['RFC822'])
-            msg = email.message_from_string(response[msgid]['RFC822'])
+            msg = email.message_from_bytes(response[msgid][b'RFC822'])
             self.__process_message(msg)
 
         # delete messages?
