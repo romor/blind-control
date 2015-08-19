@@ -43,7 +43,8 @@ class StateCtrl:
         for i in range(len(self.config['WINDOWS'])):
         
             # switching necessary?
-            if self.current_states[i] != self.desired_states[i]:
+            if self.desired_states[i] is not None and \
+                    self.current_states[i] != self.desired_states[i]:
                 window_cfg = self.config['WINDOWS'][i]
                 
                 # determine command type
@@ -147,7 +148,8 @@ class StateCtrl:
         # update class member
         has_changed = False
         for i in range(len(self.config['WINDOWS'])):
-            if self.current_states[i] != self.desired_states[i]:
+            if self.desired_states[i] is not None and \
+                    self.current_states[i] != self.desired_states[i]:
                 has_changed = True
                 self.current_states[i] = self.desired_states[i]
         

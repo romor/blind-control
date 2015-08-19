@@ -93,7 +93,7 @@ class Zamg(StandardScript):
 
     def set_mqtt(self, temperature, sun):
         # publish values to MQTT broker
-        path = self.config['MQTT_STORAGE']['prefix']+"/zamg"
+        path = self.config['MQTT_STORAGE']['prefix']+"zamg"
         self.mqtt.publish(path+"/temperature", temperature, retain=True)
         self.mqtt.publish(path+"/sun", sun, retain=True)
         self.mqtt.publish(path+"/last_update", str(datetime.datetime.now()), retain=True)
