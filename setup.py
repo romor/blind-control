@@ -11,6 +11,7 @@ REQUIRES = [
     'ephem',
     'RPi.GPIO',
     'imapclient',
+    'paho-mqtt',
 ]
 
 

@@ -8,6 +8,7 @@ import logging
 import datetime
 import traceback
 import configparser
+import paho.mqtt.client as mqtt
 
 # self-defined modules
 from blindctrl.shared.stdscript import StandardScript
@@ -36,6 +37,14 @@ class Zamg(StandardScript):
             self.opcclient = OpcClient(self.config['OPC_STORAGE']['url'], 
                                        self.config['OPC_STORAGE']['password'])
 
+        # setup mqtt connection
+        if self.config['MQTT_STORAGE']['enabled']:
+            self.mqtt = mqtt.Client()
+            # quick and dirty: we assume to be connected before we finished email parsing...
+            #self.mqtt.on_connect = self._on_mqtt_connect
+            self.mqtt.connect(self.config['MQTT_STORAGE']['host'], self.config['MQTT_STORAGE']['port'])
+            self.mqtt.loop_start()
+
         # setup data members
         self.data = None
 
@@ -59,8 +68,6 @@ class Zamg(StandardScript):
 
 
     def set_opc(self, temperature, sun):
-        logging.getLogger().info("Set temperature: {}, sun: {:2f}".format(temperature, sun))
-
         # setup values
         opc_tags = [self.config['OPC_STORAGE']['tag_temperature'], 
                     self.config['OPC_STORAGE']['tag_sunpower']]
@@ -84,6 +91,14 @@ class Zamg(StandardScript):
             config.write(configfile)
 
 
+    def set_mqtt(self, temperature, sun):
+        # publish values to MQTT broker
+        path = self.config['MQTT_STORAGE']['prefix']+"/zamg"
+        self.mqtt.publish(path+"/temperature", temperature, retain=True)
+        self.mqtt.publish(path+"/sun", sun, retain=True)
+        self.mqtt.publish(path+"/last_update", str(datetime.datetime.now()), retain=True)
+
+
     def process_mail(self):
         # check for entered configuration
         if len(self.config['EMAIL']['servername']) == 0:
@@ -105,11 +120,16 @@ class Zamg(StandardScript):
     def process_data(self):
         # if retrieval succeeded we have valid data now
         if self.data:
-            # store temperature, sun and powers to OPC server
+            logging.getLogger().info("Set temperature: {}, sun: {:2f}"
+                    .format(self.data['temperature'], self.data['sun']/60))
+
+            # store temperature and sun power
             if self.config['OPC_STORAGE']['enabled']:
                 self.set_opc(self.data['temperature'], self.data['sun']/60)
             if self.config['FILE_STORAGE']['enabled']:
                 self.set_file(self.data['temperature'], self.data['sun']/60)
+            if self.config['MQTT_STORAGE']['enabled']:
+                self.set_mqtt(self.data['temperature'], self.data['sun']/60)
 
 
 def main():
