@@ -47,7 +47,8 @@ class PowerCalculator():
 
     def get_window_power(self, sun, sun_coordinates, window):
         # transform from polar to euklid coordinates
-        window_coordinates = self.polar_to_euklid(window['geo']['az']*math.pi/180, 
+        window_azimuth = window['geo']['az'] + self.config['AZIMUTH_BASE']
+        window_coordinates = self.polar_to_euklid(window_azimuth*math.pi/180, 
                                                   window['geo']['alt']*math.pi/180)
         # determine angle
         angle = self.get_angle(sun_coordinates, window_coordinates)

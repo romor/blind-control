@@ -17,9 +17,8 @@ from blindctrl.shared.opcclient import OpcClient
 usage = """\
 Usage: {name}
 
-Based on the total sun power it derives the individual power of all windows. 
-The window data is configured in the configuration file. The total power
-is read from OPC or a file storage, depending on configuration.
+Derives the power of all windows based on their current angle to the sun. 
+The window data is configured in the configuration file.
 """
 
 
