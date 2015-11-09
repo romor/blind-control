@@ -54,13 +54,23 @@ class Zamg(StandardScript):
             decoder = CsvDecoder(self.config)
             decoder.decode(csv)
 
+            # process data
+            self.sun_today = 0
+            
             # loop through data
             for row in decoder.data:
-                # is this the current estimate?
+                # is this timestamp fitting?
                 timediff = (row['date']-datetime.datetime.utcnow()).total_seconds()
-                if -3600 <= timediff < 0:
-                    # store data as best guess
-                    self.data = row
+                # is data not older than 1 hour?
+                if timediff > -3600:
+                    # sum minutes of remaining sun for today
+                    if row['date'].date() == datetime.datetime.utcnow().date():
+                        self.sun_today += row['sun']
+                    
+                    # is this the most recent timestamp?
+                    if timediff <= 0:
+                        # store this data row as our best guess
+                        self.data = row
 
         except Exception as e:
             logging.getLogger().error(traceback.format_exc())
@@ -91,11 +101,12 @@ class Zamg(StandardScript):
             config.write(configfile)
 
 
-    def set_mqtt(self, temperature, sun):
+    def set_mqtt(self, temperature, sun, sun_today):
         # publish values to MQTT broker
         path = self.config['MQTT_STORAGE']['prefix']+"zamg"
         self.mqtt.publish(path+"/temperature", temperature, retain=True)
         self.mqtt.publish(path+"/sun", sun, retain=True)
+        self.mqtt.publish(path+"/sun_today", sun_today)
         self.mqtt.publish(path+"/last_update", str(datetime.datetime.now()), retain=True)
 
 
@@ -129,7 +140,7 @@ class Zamg(StandardScript):
             if self.config['FILE_STORAGE']['enabled']:
                 self.set_file(self.data['temperature'], self.data['sun']/60)
             if self.config['MQTT_STORAGE']['enabled']:
-                self.set_mqtt(self.data['temperature'], self.data['sun']/60)
+                self.set_mqtt(self.data['temperature'], self.data['sun']/60, self.sun_today)
 
 
 def main():
