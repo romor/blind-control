@@ -42,6 +42,9 @@ class Zamg(StandardScript):
             self.mqtt = mqtt.Client()
             # quick and dirty: we assume to be connected before we finished email parsing...
             #self.mqtt.on_connect = self._on_mqtt_connect
+            if 'user' in self.config['MQTT_STORAGE']:
+                self.mqtt.username_pw_set(self.config['MQTT_STORAGE']['user'], 
+                        self.config['MQTT_STORAGE']['password'])
             self.mqtt.connect(self.config['MQTT_STORAGE']['host'], self.config['MQTT_STORAGE']['port'])
             self.mqtt.loop_start()
 
