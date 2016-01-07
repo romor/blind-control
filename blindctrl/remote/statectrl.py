@@ -133,14 +133,18 @@ class StateCtrl:
         for i in range(len(self.config['WINDOWS'])):
             # process current state
             ctrl_id = self.config['WINDOWS'][i]['opc']['ctrl']
-            try:
-                state = int(value[2*ctrl_id:2*ctrl_id+2])
-            except KeyError:
-                logging.getLogger().error("Error getting state for window {}, {}"\
-                        .format(ctrl_id, self.config['WINDOWS'][i]['name']))
-                state = 0
+            # opc reading may be disabled for this window
+            if ctrl_id is not None:
+                try:
+                    state = int(value[2*ctrl_id:2*ctrl_id+2])
+                except KeyError:
+                    logging.getLogger().error("Error getting state for window {}, {}"\
+                            .format(ctrl_id, self.config['WINDOWS'][i]['name']))
+                    state = 0
+            else:
+                state = None
             desired_states.append(state)
-        
+
         return desired_states
 
 
