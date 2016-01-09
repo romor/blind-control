@@ -55,12 +55,14 @@ class Astrotime(StandardScript):
 
     def save_opc(self, sunset):
         # setup values
-        opc_tags = [self.config['OPC_STORAGE']['tag_sunset']]
-        types = ['float']
-        values = [sunset.hour*3600 + sunset.minute*60 + sunset.second]
+        if 'tag_sunset' in self.config['OPC_STORAGE'] and \
+                self.config['OPC_STORAGE']['tag_sunset'] is not None:
+            opc_tags = [self.config['OPC_STORAGE']['tag_sunset']]
+            types = ['float']
+            values = [sunset.hour*3600 + sunset.minute*60 + sunset.second]
 
-        # write data to OPC
-        self.opcclient.write(opc_tags, types, values)
+            # write data to OPC
+            self.opcclient.write(opc_tags, types, values)
 
 
 def main():

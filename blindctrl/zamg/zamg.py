@@ -82,13 +82,27 @@ class Zamg(StandardScript):
 
     def set_opc(self, temperature, sun):
         # setup values
-        opc_tags = [self.config['OPC_STORAGE']['tag_temperature'], 
-                    self.config['OPC_STORAGE']['tag_sunpower']]
-        types = ['float', 'float']
-        values = [temperature, sun]
+        opc_tags = []
+        types = []
+        values = []
+        
+        if 'tag_temperature' in self.config['OPC_STORAGE'] and \
+                self.config['OPC_STORAGE']['tag_temperature'] is not None:
+            # save temperature to OPC
+            opc_tags.append(self.config['OPC_STORAGE']['tag_temperature'])
+            types.append('float')
+            values.append(temperature)
+
+        if 'tag_sunpower' in self.config['OPC_STORAGE'] and \
+                self.config['OPC_STORAGE']['tag_sunpower'] is not None:
+            # save sunpower to OPC
+            opc_tags.append(self.config['OPC_STORAGE']['tag_sunpower'])
+            types.append('float')
+            values.append(sun)
 
         # write data to OPC
-        self.opcclient.write(opc_tags, types, values)
+        if len(opc_tags):
+            self.opcclient.write(opc_tags, types, values)
 
 
     def set_file(self, temperature, sun):
