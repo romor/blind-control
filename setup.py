@@ -9,7 +9,7 @@ import pkg_resources
 # needed packages
 REQUIRES = [
     'ephem',
-    'RPi.GPIO',
+    'RPi.GPIO >= 0.6',
     'imapclient',
     'paho-mqtt',
 ]
