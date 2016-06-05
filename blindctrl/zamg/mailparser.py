@@ -26,14 +26,14 @@ class MailParser():
 
 
     def parse(self):
-        server = IMAPClient(self.config['EMAIL']['servername'])
+        use_ssl = True if self.config['EMAIL']['useSSL'] else False
+        server = IMAPClient(self.config['EMAIL']['servername'], ssl=use_ssl)
         server.login(self.config['EMAIL']['username'], self.config['EMAIL']['password'])
         logging.getLogger().debug("connected to IMAP server")
 
         select_info = server.select_folder('INBOX')
         # get list of fitting messages
-        messages = server.search(['NOT DELETED',
-                                  'SUBJECT "' + self.config['EMAIL']['subject'] + '"'])
+        messages = server.search(['NOT', 'DELETED', 'SUBJECT', self.config['EMAIL']['subject']])
         logging.getLogger().info("%d email message(s) found" % len(messages))
 
         # loop through all messages
