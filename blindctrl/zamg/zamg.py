@@ -59,6 +59,7 @@ class Zamg(StandardScript):
 
             # process data
             self.sun_today = 0
+            entry_found = False
             
             # loop through data
             for row in decoder.data:
@@ -71,9 +72,10 @@ class Zamg(StandardScript):
                         self.sun_today += row['sun']
                     
                     # is this the most recent timestamp?
-                    if timediff <= 0:
+                    if not entry_found:
                         # store this data row as our best guess
                         self.data = row
+                        entry_found = True
 
         except Exception as e:
             logging.getLogger().error(traceback.format_exc())
