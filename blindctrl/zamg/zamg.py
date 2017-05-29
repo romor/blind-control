@@ -66,7 +66,7 @@ class Zamg(StandardScript):
                 # is this timestamp fitting?
                 timediff = (row['date']-datetime.datetime.utcnow()).total_seconds()
                 # is data not older than 0.5 hours?
-                if timediff > -1800:
+                if timediff >= 0:
                     # sum minutes of remaining sun for today
                     if row['date'].date() == datetime.datetime.utcnow().date():
                         self.sun_today += row['sun']
