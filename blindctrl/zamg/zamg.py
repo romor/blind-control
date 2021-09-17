@@ -15,6 +15,7 @@ from blindctrl.shared.stdscript import StandardScript
 from blindctrl.zamg.mailparser import MailParser
 from blindctrl.zamg.csvdecoder import CsvDecoder
 from blindctrl.shared.opcclient import OpcClient
+from blindctrl.shared.httpclient import HttpClient
 
 
 usage = """\
@@ -34,8 +35,12 @@ class Zamg(StandardScript):
 
         # setup OPC interface
         if self.config['OPC_STORAGE']['enabled']:
-            self.opcclient = OpcClient(self.config['OPC_STORAGE']['url'], 
-                                       self.config['OPC_STORAGE']['password'])
+            if "type_json" in self.config['OPC_STORAGE'] and self.config['OPC_STORAGE']['type_json']:
+                self.opcclient = HttpClient(self.config['OPC_STORAGE']['url'],
+                                            self.config['OPC_STORAGE']['password'])
+            else:
+                self.opcclient = OpcClient(self.config['OPC_STORAGE']['url'],
+                                           self.config['OPC_STORAGE']['password'])
 
         # setup mqtt connection
         if self.config['MQTT_STORAGE']['enabled']:
@@ -43,14 +48,14 @@ class Zamg(StandardScript):
             # quick and dirty: we assume to be connected before we finished email parsing...
             #self.mqtt.on_connect = self._on_mqtt_connect
             if 'user' in self.config['MQTT_STORAGE']:
-                self.mqtt.username_pw_set(self.config['MQTT_STORAGE']['user'], 
-                        self.config['MQTT_STORAGE']['password'])
-            self.mqtt.connect(self.config['MQTT_STORAGE']['host'], self.config['MQTT_STORAGE']['port'])
+                self.mqtt.username_pw_set(self.config['MQTT_STORAGE']['user'],
+                                          self.config['MQTT_STORAGE']['password'])
+            self.mqtt.connect(self.config['MQTT_STORAGE']['host'],
+                              self.config['MQTT_STORAGE']['port'])
             self.mqtt.loop_start()
 
         # setup data members
         self.data = None
-
 
     def process_csv(self, csv):
         try:
@@ -60,7 +65,7 @@ class Zamg(StandardScript):
             # process data
             self.sun_today = 0
             entry_found = False
-            
+
             # loop through data
             for row in decoder.data:
                 # is this timestamp fitting?
@@ -70,7 +75,7 @@ class Zamg(StandardScript):
                     # sum minutes of remaining sun for today
                     if row['date'].date() == datetime.datetime.utcnow().date():
                         self.sun_today += row['sun']
-                    
+
                     # is this the most recent timestamp?
                     if not entry_found:
                         # store this data row as our best guess
@@ -81,13 +86,12 @@ class Zamg(StandardScript):
             logging.getLogger().error(traceback.format_exc())
             raise
 
-
     def set_opc(self, temperature, sun):
         # setup values
         opc_tags = []
         types = []
         values = []
-        
+
         if 'tag_temperature' in self.config['OPC_STORAGE'] and \
                 self.config['OPC_STORAGE']['tag_temperature'] is not None:
             # save temperature to OPC
@@ -106,19 +110,17 @@ class Zamg(StandardScript):
         if len(opc_tags):
             self.opcclient.write(opc_tags, types, values)
 
-
     def set_file(self, temperature, sun):
         config = configparser.ConfigParser()
         # read existing file data
         if os.path.isfile(self.config['FILE_STORAGE']['filename']):
             config.read(self.config['FILE_STORAGE']['filename'])
-            
+
         config[self.scriptname] = {}
         config[self.scriptname]['Temperature'] = str(temperature)
         config[self.scriptname]['SunPower'] = str(sun)
         with open(self.config['FILE_STORAGE']['filename'], 'w') as configfile:
             config.write(configfile)
-
 
     def set_mqtt(self, temperature, sun, sun_today):
         # publish values to MQTT broker
@@ -127,7 +129,6 @@ class Zamg(StandardScript):
         self.mqtt.publish(path+"/sun", sun, retain=True)
         self.mqtt.publish(path+"/sun_today", sun_today)
         self.mqtt.publish(path+"/last_update", str(datetime.datetime.now()), retain=True)
-
 
     def process_mail(self):
         # check for entered configuration
@@ -146,12 +147,11 @@ class Zamg(StandardScript):
         except Exception as e:
             logging.getLogger().error(traceback.format_exc())
 
-
     def process_data(self):
         # if retrieval succeeded we have valid data now
         if self.data:
             logging.getLogger().info("Set temperature: {}, sun: {:2f}"
-                    .format(self.data['temperature'], self.data['sun']/60))
+                                     .format(self.data['temperature'], self.data['sun']/60))
 
             # store temperature and sun power
             if self.config['OPC_STORAGE']['enabled']:
@@ -169,6 +169,7 @@ def main():
     # fetch csv files from email server
     zamg.process_mail()
     zamg.process_data()
+
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:

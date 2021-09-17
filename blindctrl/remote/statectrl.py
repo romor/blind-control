@@ -2,13 +2,13 @@
 # -*- coding: iso-8859-15 -*-
 
 # standard modules
-import sys
 import os
 import logging
 import configparser
 
 # self-defined modules
 from blindctrl.shared.opcclient import OpcClient
+from blindctrl.shared.httpclient import HttpClient
 
 
 class StateCtrl:
@@ -22,12 +22,11 @@ class StateCtrl:
         # initialize data storage
         self.desired_states = []
         self.cmds = []
-        
 
-    def get_switching_commands(self, desired_state = None):
+    def get_switching_commands(self, desired_state=None):
         if desired_state is None:
             # read desired states from file or OPC
-            if self.config['OPC_STORAGE']['enabled']:
+            if self.config['OPC_STORAGE']['enabled'] and self.config['OPC_STORAGE']['tag_control']:
                 self.desired_states = self._read_opc()
             else:
                 self.desired_states = self._read_desired_state()
@@ -41,12 +40,12 @@ class StateCtrl:
 
         # determine switching commands
         for i in range(len(self.config['WINDOWS'])):
-        
+
             # switching necessary?
             if self.desired_states[i] is not None and \
                     self.current_states[i] != self.desired_states[i]:
                 window_cfg = self.config['WINDOWS'][i]
-                
+
                 # determine command type
                 if self.desired_states[i]:
                     # down command
@@ -60,11 +59,11 @@ class StateCtrl:
                         cmd = window_cfg['up_cmd']
                     else:
                         cmd = "up"
-                
+
                 # command may be disabled by config file
                 if cmd is not None:
                     logging.getLogger().info("Switching {} to {}.".format(
-                            window_cfg['name'], cmd))
+                        window_cfg['name'], cmd))
                     # store command
                     self.cmds.append({
                         'remote': window_cfg['remote'],
@@ -72,7 +71,6 @@ class StateCtrl:
                     })
                 else:
                     logging.getLogger().info("Skipping command for {}.".format(window_cfg['name']))
-
 
     def _read_current_state(self):
         config = configparser.ConfigParser()
@@ -83,7 +81,7 @@ class StateCtrl:
 
         # create data array
         current_states = []
-        
+
         for window in self.config['WINDOWS']:
             # process current states
             try:
@@ -94,7 +92,6 @@ class StateCtrl:
 
         return current_states
 
-
     def _read_desired_states(self):
         config = configparser.ConfigParser()
         try:
@@ -104,7 +101,7 @@ class StateCtrl:
 
         # create data array
         desired_states = []
-        
+
         for window in self.config['WINDOWS']:
             # process desired states
             try:
@@ -112,18 +109,21 @@ class StateCtrl:
             except KeyError:
                 # this is an error only if we use file commands, not OPC
                 if not self.config['OPC_STORAGE']['enabled']:
-                    logging.getLogger().error("No command state present for {}."\
-                                .format(window['name']))
+                    logging.getLogger().error("No command state present for {}."
+                                              .format(window['name']))
                 state = 0
             desired_states.append(state)
-        
-        return desired_states
 
+        return desired_states
 
     def _read_opc(self):
         desired_states = []
-        opcclient = OpcClient(self.config['OPC_STORAGE']['url'],
-                              self.config['OPC_STORAGE']['password'])
+        if "type_json" in self.config['OPC_STORAGE'] and self.config['OPC_STORAGE']['type_json']:
+            opcclient = HttpClient(self.config['OPC_STORAGE']['url'],
+                                   self.config['OPC_STORAGE']['password'])
+        else:
+            opcclient = OpcClient(self.config['OPC_STORAGE']['url'],
+                                  self.config['OPC_STORAGE']['password'])
         opc_tags = [
             self.config['OPC_STORAGE']['tag_control'],
         ]
@@ -138,15 +138,14 @@ class StateCtrl:
                 try:
                     state = int(value[2*ctrl_id:2*ctrl_id+2])
                 except KeyError:
-                    logging.getLogger().error("Error getting state for window {}, {}"\
-                            .format(ctrl_id, self.config['WINDOWS'][i]['name']))
+                    logging.getLogger().error("Error getting state for window {}, {}"
+                                              .format(ctrl_id, self.config['WINDOWS'][i]['name']))
                     state = 0
             else:
                 state = None
             desired_states.append(state)
 
         return desired_states
-
 
     def store_desired_states(self):
         # update class member
@@ -156,7 +155,7 @@ class StateCtrl:
                     self.current_states[i] != self.desired_states[i]:
                 has_changed = True
                 self.current_states[i] = self.desired_states[i]
-        
+
         if has_changed:
             # update file storage
             config = configparser.ConfigParser()
@@ -172,7 +171,7 @@ class StateCtrl:
             for i in range(len(self.config['WINDOWS'])):
                 # store in file
                 config['statectrl'][self.config['WINDOWS'][i]['name']] = \
-                                            str(int(self.current_states[i]))
+                    str(int(self.current_states[i]))
 
             # save data file
             with open(self.config['FILE_STORAGE']['filename'], 'w') as configfile:

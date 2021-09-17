@@ -11,6 +11,7 @@ import ephem
 # self-defined modules
 from blindctrl.shared.stdscript import StandardScript
 from blindctrl.shared.opcclient import OpcClient
+from blindctrl.shared.httpclient import HttpClient
 
 
 usage = """\
@@ -26,13 +27,16 @@ class Astrotime(StandardScript):
     def __init__(self):
         # call parent constructor
         super().__init__()
-        
+
         # setup OPC interface
         if not self.config['OPC_STORAGE']['enabled']:
             raise Exception("Astrotime needs OPC storage enabled")
-        self.opcclient = OpcClient(self.config['OPC_STORAGE']['url'], 
-                                   self.config['OPC_STORAGE']['password'])
-
+        if "type_json" in self.config['OPC_STORAGE'] and self.config['OPC_STORAGE']['type_json']:
+            self.opcclient = HttpClient(self.config['OPC_STORAGE']['url'],
+                                        self.config['OPC_STORAGE']['password'])
+        else:
+            self.opcclient = OpcClient(self.config['OPC_STORAGE']['url'],
+                                       self.config['OPC_STORAGE']['password'])
 
     def process(self):
         try:
@@ -44,14 +48,13 @@ class Astrotime(StandardScript):
             o.horizon = self.HORIZON
             sunset = ephem.localtime(o.next_setting(ephem.Sun()))
             logging.getLogger().info("Setting sunset to {}".format(sunset.strftime("%H:%M:%S")))
-            
+
             # store to OPC data point
             self.save_opc(sunset)
 
         except Exception as e:
             logging.getLogger().error(traceback.format_exc())
             raise
-
 
     def save_opc(self, sunset):
         # setup values
@@ -71,7 +74,8 @@ def main():
     astrotime = Astrotime()
     # derive time
     astrotime.process()
-    
+
+
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         # main entry point

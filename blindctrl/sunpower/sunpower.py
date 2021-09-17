@@ -12,6 +12,7 @@ import traceback
 from blindctrl.shared.stdscript import StandardScript
 from blindctrl.sunpower.powercalc import PowerCalculator
 from blindctrl.shared.opcclient import OpcClient
+from blindctrl.shared.httpclient import HttpClient
 
 
 usage = """\
@@ -26,21 +27,24 @@ class SunPower(StandardScript):
     def __init__(self):
         # call parent constructor
         super().__init__()
-        
+
         # setup OPC interface
         if self.config['OPC_STORAGE']['enabled']:
-            self.opcclient = OpcClient(self.config['OPC_STORAGE']['url'], 
-                                       self.config['OPC_STORAGE']['password'])
-                                       
+            if "type_json" in self.config['OPC_STORAGE'] and self.config['OPC_STORAGE']['type_json']:
+                self.opcclient = HttpClient(self.config['OPC_STORAGE']['url'],
+                                            self.config['OPC_STORAGE']['password'])
+            else:
+                self.opcclient = OpcClient(self.config['OPC_STORAGE']['url'],
+                                           self.config['OPC_STORAGE']['password'])
+
         # setup power calculator
         self.calculator = PowerCalculator(self.config)
 
-        
     def process(self):
         try:
             # process effective angles
             self.calculator.process(self.config['WINDOWS'])
-            
+
             # store power values
             if self.config['OPC_STORAGE']['enabled']:
                 self.save_opc()
@@ -50,16 +54,15 @@ class SunPower(StandardScript):
         except Exception as e:
             logging.getLogger().error(traceback.format_exc())
             raise
-            
-        return self.calculator.power_values
 
+        return self.calculator.power_values
 
     def save_opc(self):
         # store OPC requests
         opc_tags = []
         types = []
         values = []
-        
+
         # setup values
         for i in range(len(self.config['WINDOWS'])):
             if self.config['WINDOWS'][i]['opc']['power'] is not None:
@@ -79,13 +82,13 @@ class SunPower(StandardScript):
                 config.read(self.config['FILE_STORAGE']['filename'])
             except configparser.ParsingError as e:
                 logging.getLogger().error("Error parsing file storage: " + str(e))
-            
+
         # recreate data of this script
         config['sunpower'] = {}
         for i in range(len(self.config['WINDOWS'])):
             config['sunpower'][self.config['WINDOWS'][i]['name']] = \
-                                        str(self.calculator.power_values[i])
-                                        
+                str(self.calculator.power_values[i])
+
         # save data file
         with open(self.config['FILE_STORAGE']['filename'], 'w') as configfile:
             config.write(configfile)
