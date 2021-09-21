@@ -2,6 +2,7 @@
 
 import logging
 import urllib.request
+import ssl
 import base64
 import json
 
@@ -16,6 +17,10 @@ class HttpClient():
             'Content-Type': 'application/json',
             'Authorization': authorization,
         }
+        # ignore ssl certificate errors
+        self.ctx = ssl.create_default_context()
+        self.ctx.check_hostname = False
+        self.ctx.verify_mode = ssl.CERT_NONE
 
     def read(self, opc_tags, callback=None, callback_arguments=None, error_callback=None):
         # convert potential single tag to array
@@ -34,7 +39,7 @@ class HttpClient():
         # prepare SOAP request.
         request = urllib.request.Request(
             self.url, json.dumps(json_body).encode(), self.http_headers)
-        result = urllib.request.urlopen(request)
+        result = urllib.request.urlopen(request, context=self.ctx)
 
         # parse result
         response = result.read()
@@ -63,7 +68,7 @@ class HttpClient():
 
         request = urllib.request.Request(
             self.url, json.dumps(json_body).encode(), self.http_headers)
-        result = urllib.request.urlopen(request)
+        result = urllib.request.urlopen(request, context=self.ctx)
 
         # parse result
         response = result.read()
