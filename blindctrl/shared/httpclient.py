@@ -42,9 +42,13 @@ class HttpClient():
         result = urllib.request.urlopen(request, context=self.ctx)
 
         # parse result
-        response = result.read()
-        root = json.loads(response)
-        values = root["ReadResponse"]
+        try:
+            response = result.read()
+            root = json.loads(response)
+            values = root["ReadResponse"]
+        except Exception as exc:
+            logging.error("http read error: {}, {}", str(exc), response)
+            raise exc
         # call notification handler
         # if callback is not None:
         #  callback(values, callback_arguments)
