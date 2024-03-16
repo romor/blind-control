@@ -44,7 +44,7 @@ class Zamg(StandardScript):
 
         # setup mqtt connection
         if self.config['MQTT_STORAGE']['enabled']:
-            self.mqtt = mqtt.Client()
+            self.mqtt = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
             # quick and dirty: we assume to be connected before we finished email parsing...
             #self.mqtt.on_connect = self._on_mqtt_connect
             if 'user' in self.config['MQTT_STORAGE']:

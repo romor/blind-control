@@ -11,7 +11,7 @@ REQUIRES = [
     'ephem',
     'RPi.GPIO >= 0.6',
     'imapclient',
-    'paho-mqtt',
+    'paho-mqtt >= 2',
 ]
 
 
