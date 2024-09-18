@@ -8,9 +8,9 @@ import json
 
 
 class HttpClient():
-    def __init__(self, url, password):
+    def __init__(self, url, password, username="operator"):
         self.url = url
-        credentials = "operator:{}".format(password).encode()
+        credentials = f"{username}:{password}".encode()
         encoded_credentials = base64.b64encode(credentials)
         authorization = b'Basic ' + encoded_credentials
         self.http_headers = {
@@ -54,7 +54,9 @@ class HttpClient():
         #  callback(values, callback_arguments)
         return values
 
-    def write(self, opc_tags, types, values, callback=None, callback_arguments=None, error_callback=None):
+    def write(
+            self, opc_tags, types, values, callback=None, callback_arguments=None,
+            error_callback=None):
         # build message body
         write_items = []
         for i in range(len(opc_tags)):
